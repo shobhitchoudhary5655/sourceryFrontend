@@ -18,8 +18,8 @@ const Attendance = () => {
     { key: 'date', title: 'Date' },
     {
       key: 'status', title: 'Status',
-      render: (value: string) => (
-        <StatusBadge status={value} />
+      render: (value: unknown) => (
+        <StatusBadge status={value as string} />
       ),
     },
     { key: 'checkIn', title: 'Check In' },

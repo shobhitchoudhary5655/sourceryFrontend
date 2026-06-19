@@ -18,8 +18,8 @@ const LeaveRequests = () => {
     { key: 'to', title: 'To' },
     {
       key: 'status', title: 'Status',
-      render: (value: string) => (
-        <StatusBadge status={value} />
+      render: (value: unknown) => (
+        <StatusBadge status={value as string} />
       ),
     }
   ];

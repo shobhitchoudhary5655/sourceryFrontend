@@ -17,8 +17,8 @@ const Employees = () => {
     { key: 'role', title: 'Role' },
     {
       key: 'status', title: 'Status',
-      render: (value: string) => (
-        <StatusBadge status={value} />
+      render: (value: unknown) => (
+        <StatusBadge status={value as string} />
       ),
     },
   ];
