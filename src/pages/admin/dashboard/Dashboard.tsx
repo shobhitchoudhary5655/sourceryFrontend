@@ -25,7 +25,7 @@ const Dashboard = () => {
   const breadcrumbItems = [...pathnames];
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  // const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
 
   const loadDashboardData = useCallback(async () => {
@@ -51,14 +51,14 @@ const Dashboard = () => {
     fetchDashboard();
   }, [loadDashboardData]);
 
-  const handleRefresh = async () => {
-    try {
-      setRefreshing(true);
-      await loadDashboardData();
-    } finally {
-      setRefreshing(false);
-    }
-  };
+  // const handleRefresh = async () => {
+  //   try {
+  //     setRefreshing(true);
+  //     await loadDashboardData();
+  //   } finally {
+  //     setRefreshing(false);
+  //   }
+  // };
 
   const stats = [
     {
@@ -118,7 +118,7 @@ const Dashboard = () => {
         <p className="text-red-500">{error}</p>
 
         <button
-          onClick={handleRefresh}
+          // onClick={handleRefresh}
           className="rounded-lg bg-[#7F26FD] px-4 py-2 text-sm font-medium text-white"
         >
           Try Again
