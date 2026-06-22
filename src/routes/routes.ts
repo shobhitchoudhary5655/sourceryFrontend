@@ -6,27 +6,28 @@ export const ROUTES = {
   PROFILE: '/profile',
 
   ADMIN: {
-    DASHBOARD: '/admin/dashboard',
-    EMPLOYEES: '/admin/employees',
-    ATTENDANCE: '/admin/attendance',
-    LEAVEREQUESTS: '/admin/leave-requests',
-    ROLES: '/admin/roles',
-    HOLIDAYS: '/admin/holidays',
-    SETTINGS: '/admin/setting',
+    DASHBOARD: '/dashboard',
+    EMPLOYEES: '/employees',
+    ATTENDANCE: '/attendance',
+    EMPLOYEEATTENDANCEDETAILS: '/attendance/:employeeId',
+    LEAVEREQUESTS: '/leave-requests',
+    ROLES: '/roles',
+    HOLIDAYS: '/holidays',
+    SETTINGS: '/setting',
   },
 
   HR: {
-    DASHBOARD: '/hr/dashboard',
-    EMPLOYEES: '/hr/employees',
-    ATTENDANCE: '/hr/attendance',
-    HOLIDAYS: '/hr/holidays',
+    DASHBOARD: '/dashboard',
+    EMPLOYEES: '/employees',
+    ATTENDANCE: '/attendance',
+    HOLIDAYS: '/holidays',
   },
 
   EMPLOYEE: {
-    DASHBOARD: '/employee/dashboard',
-    PROFILE: '/employee/profile',
-    ATTENDANCE: '/employee/attendance',
-    HOLIDAYS: '/employee/holidays',
+    DASHBOARD: '/dashboard',
+    PROFILE: '/profile',
+    ATTENDANCE: '/attendance',
+    HOLIDAYS: '/holidays',
   },
 };
 

@@ -1,52 +1,96 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PageHeader from '@/components/common/Header/PageHeader';
 import DataTable from '@/components/ui/Table/DataTable';
 import Breadcrumb from '@/components/common/Breadcrumb/Breadcrumb';
 import TableSearch from '@/components/ui/Table/TableSearch';
 import StatusBadge from '@/components/ui/StatusBadge/StatusBadge';
+import { getLeaveRequests } from '@/services/admin.service';
+import { useNavigate } from 'react-router-dom';
+import { FiEye, } from 'react-icons/fi';
+
+interface LeaveRow {
+  id: number;
+  name: string;
+  type: string;
+  from: string;
+  to: string;
+  status: string;
+}
 
 const LeaveRequests = () => {
-  const [search, setSearch] = useState('')
-  const [page, setPage] = useState(1)
-  const pathNames = location.pathname.split('/').filter((x) => x)
-  const breadcrumbItems = [...pathNames]
-  const loading = false
+  const navigate = useNavigate();
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+
+  const [data, setData] = useState<LeaveRow[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchLeaves = async () => {
+    try {
+      setLoading(true);
+      const response = await getLeaveRequests(search, 'all', page, 10,);
+      const mapped = response.requests.map((item: any) => ({
+        id: item.id,
+        name: item.user?.name || '-',
+        type: item.type || item.leaveType || '-',
+        from: item.fromDate || item.startDate || '-',
+        to: item.toDate || item.endDate || '-',
+        status: item.status,
+      }));
+
+      setData(mapped);
+      setTotalPages(response.totalPages || 1);
+    } catch (error) {
+      console.error('Failed to fetch leave requests:', error);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchLeaves();
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [search, page]);
+
   const columns = [
     { key: 'name', title: 'Employee' },
     { key: 'type', title: 'Type' },
     { key: 'from', title: 'From' },
     { key: 'to', title: 'To' },
     {
-      key: 'status', title: 'Status',
+      key: 'status',
+      title: 'Status',
       render: (value: unknown) => (
         <StatusBadge status={value as string} />
+      ),
+    },
+    {
+      key: 'action',
+      title: 'Action',
+      render: (_: unknown, row: any) => (
+        <button
+          onClick={() => navigate(`/leave-requests/${row.id}`)}
+          className="text-blue-600 hover:text-blue-800"
+          title="View"
+        >
+          <FiEye size={18} />
+        </button>
       ),
     }
   ];
 
-  const data = [
-    {
-      name: 'Aman',
-      type: 'Sick Leave',
-      from: '2026-06-10',
-      to: '2026-06-12',
-      status: 'Pending',
-    },
-  ];
-
   const filteredData = useMemo(() => {
     return data.filter((item) =>
-      item.name
-        .toLowerCase()
-        .includes(search.toLowerCase())
+      item.name.toLowerCase().includes(search.toLowerCase())
     );
   }, [data, search]);
 
   const pageSize = 10;
-
-  const totalPages = Math.ceil(
-    filteredData.length / pageSize
-  );
 
   const paginatedData = filteredData.slice(
     (page - 1) * pageSize,
@@ -56,34 +100,14 @@ const LeaveRequests = () => {
   return (
     <div>
       <div className="flex items-start justify-between">
-        <PageHeader
-          title="Leave Requests"
-        // subtitle="Approve or reject leaves"
-        />
-
-        <Breadcrumb items={breadcrumbItems} />
+        <PageHeader title="Leave Requests" />
+        <Breadcrumb />
       </div>
-      {/* <DataTable columns={columns} data={data} /> */}
-      <div className="space-y-5">
-        {/* Search + Action */}
-        <div className="flex items-center justify-between">
-          <TableSearch
-            value={search}
-            onChange={setSearch}
-          />
 
-          {/* <button
-            className="
-              px-4
-              py-2
-              rounded-xl
-              bg-[#7F26FD]
-              text-white
-              hover:opacity-90
-            "
-          >
-            + Add Employee
-          </button> */}
+      <div className="space-y-5">
+        {/* Search */}
+        <div className="flex items-center justify-between">
+          <TableSearch value={search} onChange={setSearch} />
         </div>
 
         {/* Table */}
