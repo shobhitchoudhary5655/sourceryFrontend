@@ -5,6 +5,7 @@ import PageHeader from '@/components/common/Header/PageHeader';
 import DataTable from '@/components/ui/Table/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge/StatusBadge';
 import { getAttendanceStatus, getEmployeeAttendance, } from '@/services/admin.service';
+import { formatISTTime } from '@/utils/dateTime';
 interface AttendanceRecord {
   id: number;
   userId: number;
@@ -51,25 +52,6 @@ const formatStatus = (status: string) => {
   return labels[status] || status;
 };
 
-const formatTime = (time: string | null) => {
-  if (!time) return '-';
-
-  if (time.includes('AM') || time.includes('PM')) {
-    return time;
-  }
-
-  const date = new Date(`1970-01-01T${time}`);
-
-  if (Number.isNaN(date.getTime())) {
-    return time;
-  }
-
-  return date.toLocaleTimeString('en-IN', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-  });
-};
 
 const getMonthAttendanceRows = (
   month: number,
@@ -98,8 +80,8 @@ const getMonthAttendanceRows = (
         id: attendanceItem.id,
         date,
         status: attendanceItem.status,
-        checkIn: formatTime(attendanceItem.checkIn),
-        checkOut: formatTime(attendanceItem.checkOut),
+        checkIn: formatISTTime(attendanceItem.checkIn),
+        checkOut: formatISTTime(attendanceItem.checkOut),
         workingHours: attendanceItem.workingHours || 0,
       };
     }
