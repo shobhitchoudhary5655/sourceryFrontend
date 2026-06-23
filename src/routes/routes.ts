@@ -8,11 +8,17 @@ export const ROUTES = {
   ADMIN: {
     DASHBOARD: '/dashboard',
     EMPLOYEES: '/employees',
+    ADDEMPLOYEE: "/employees/add",
+    EDITEMPLOYEE: "/employees/edit/:id",
+    DETAILSEMPLOYEE: "/employees/:id",
     ATTENDANCE: '/attendance',
     EMPLOYEEATTENDANCEDETAILS: '/attendance/:employeeId',
-    LEAVEREQUESTS: '/leave-requests',
+    LEAVEREQUESTS: '/requests',
+    REQUESTSDETAILS:'/requests/:id',
     ROLES: '/roles',
     HOLIDAYS: '/holidays',
+    ADDHOLIDAY: "/holidays/add",
+    EDITHOLIDAY: "/holidays/edit/:id",
     SETTINGS: '/setting',
   },
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import PageHeader from '@/components/common/Header/PageHeader';
 import { createEmployee, getRoles } from '@/services/admin.service';
+import PageLoader from '@/components/common/Loader/PageLoader';
 
 const AddEmployee = () => {
   const navigate = useNavigate();
@@ -27,11 +28,17 @@ const AddEmployee = () => {
         console.error(err);
       }
     };
+
     fetchRoles();
   }, []);
 
-  const handleChange = (e: any) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const isValid =
@@ -56,116 +63,176 @@ const AddEmployee = () => {
     }
   };
 
-  return (
-    <div className="space-y-6">
+  if (loading) {
+    return <PageLoader />
+  }
 
+  const inputClass =
+    'mt-1 w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-[#7F26FD] focus:ring-2 focus:ring-[#7F26FD]/30 sm:text-base';
+
+  return (
+    <div className="mx-auto w-full max-w-5xl space-y-4 sm:space-y-6">
       <PageHeader title="Add Employee" />
 
-=      <div className="bg-white border rounded-2xl p-6 shadow-sm space-y-5">
+      <div className="space-y-5 rounded-xl border bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6 lg:p-8">
+        <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2">
+          <div className="min-w-0">
+            <label
+              htmlFor="name"
+              className="text-sm font-medium text-gray-600"
+            >
+              Full Name <span className="text-red-500">*</span>
+            </label>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-          <div>
-            <label className="text-sm text-gray-600">Full Name</label>
             <input
+              id="name"
               name="name"
+              value={form.name}
               onChange={handleChange}
               placeholder="Enter full name"
-              className="w-full mt-1 border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7F26FD]"
+              className={inputClass}
             />
           </div>
 
-=          <div>
-            <label className="text-sm text-gray-600">Email</label>
+          <div className="min-w-0">
+            <label
+              htmlFor="email"
+              className="text-sm font-medium text-gray-600"
+            >
+              Email <span className="text-red-500">*</span>
+            </label>
+
             <input
+              id="email"
               name="email"
+              type="email"
+              value={form.email}
               onChange={handleChange}
               placeholder="Enter email"
-              className="w-full mt-1 border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7F26FD]"
+              className={inputClass}
             />
           </div>
 
-          <div>
-            <label className="text-sm text-gray-600">Password</label>
+          <div className="min-w-0">
+            <label
+              htmlFor="password"
+              className="text-sm font-medium text-gray-600"
+            >
+              Password <span className="text-red-500">*</span>
+            </label>
+
             <div className="relative">
               <input
+                id="password"
                 name="password"
                 type={showPassword ? 'text' : 'password'}
+                value={form.password}
                 onChange={handleChange}
                 placeholder="Enter password"
-                className="w-full mt-1 border px-4 py-2 rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-[#7F26FD]"
+                className={`${inputClass} pr-11`}
               />
 
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 text-gray-500"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#7F26FD]"
+                aria-label={
+                  showPassword ? 'Hide password' : 'Show password'
+                }
               >
-                {showPassword ? <FiEyeOff /> : <FiEye />}
+                {showPassword ? <FiEyeOff size={19} /> : <FiEye size={19} />}
               </button>
             </div>
           </div>
 
-          <div>
-            <label className="text-sm text-gray-600">Phone</label>
+          <div className="min-w-0">
+            <label
+              htmlFor="phone"
+              className="text-sm font-medium text-gray-600"
+            >
+              Phone
+            </label>
+
             <input
+              id="phone"
               name="phone"
+              type="tel"
+              value={form.phone}
               onChange={handleChange}
               placeholder="Enter phone number"
-              className="w-full mt-1 border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7F26FD]"
+              className={inputClass}
             />
           </div>
 
-          <div>
-            <label className="text-sm text-gray-600">Designation</label>
+          <div className="min-w-0">
+            <label
+              htmlFor="designation"
+              className="text-sm font-medium text-gray-600"
+            >
+              Designation
+            </label>
+
             <input
+              id="designation"
               name="designation"
+              value={form.designation}
               onChange={handleChange}
               placeholder="e.g. Software Engineer"
-              className="w-full mt-1 border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7F26FD]"
+              className={inputClass}
             />
           </div>
 
-          <div>
-            <label className="text-sm text-gray-600">Role</label>
+          <div className="min-w-0">
+            <label
+              htmlFor="roleId"
+              className="text-sm font-medium text-gray-600"
+            >
+              Role <span className="text-red-500">*</span>
+            </label>
+
             <select
+              id="roleId"
               name="roleId"
+              value={form.roleId}
               onChange={handleChange}
-              className="w-full mt-1 border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7F26FD]"
+              className={inputClass}
             >
               <option value="">Select Role</option>
-              {roles.map((r: any) => (
-                <option key={r.id} value={r.id}>
-                  {r.name}
+
+              {roles.map((role: any) => (
+                <option key={role.id} value={role.id}>
+                  {role.name}
                 </option>
               ))}
             </select>
           </div>
-
         </div>
 
-        <div className="flex justify-end gap-3 pt-4">
-
+        <div className="flex flex-col-reverse gap-3 border-t pt-5 sm:flex-row sm:justify-end">
           <button
+            type="button"
             onClick={() => navigate('/employees')}
-            className="px-4 py-2 border rounded-lg"
+            disabled={loading}
+            className="w-full rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
             Cancel
           </button>
 
           <button
+            type="button"
             onClick={handleSubmit}
             disabled={!isValid || loading}
-            className={`
-              px-5 py-2 rounded-lg text-white
-              ${isValid ? 'bg-[#7F26FD]' : 'bg-gray-400'}
-            `}
+            className="
+              w-full rounded-lg bg-[#7F26FD]
+              px-5 py-2.5 text-sm font-medium text-white
+              transition hover:bg-[#6a1ee0]
+              disabled:cursor-not-allowed disabled:bg-gray-400
+              sm:w-auto
+            "
           >
             {loading ? 'Creating...' : 'Create Employee'}
           </button>
-
         </div>
-
       </div>
     </div>
   );

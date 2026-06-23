@@ -7,6 +7,8 @@ import TableSearch from '@/components/ui/Table/TableSearch';
 import StatusBadge from '@/components/ui/StatusBadge/StatusBadge';
 import { getEmployees } from '@/services/admin.service';
 import { FiEye, } from 'react-icons/fi';
+import { formatISTTime } from '@/utils/dateTime';
+import PageLoader from '@/components/common/Loader/PageLoader';
 
 interface EmployeeAttendanceRow {
   id: number;
@@ -15,16 +17,50 @@ interface EmployeeAttendanceRow {
   status: string;
   checkIn: string;
   checkOut: string;
+  checkInRaw: string | null;
+  checkOutRaw: string | null;
+  workingHours: number;
 }
 
-const formatTime = (time?: string | null) => {
-  if (!time) return '-';
-  const date = new Date(`1970-01-01T${time}`);
-  return date.toLocaleTimeString('en-IN', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-  });
+const formatStatus = (status?: string) => {
+  const labels: Record<string, string> = {
+    present: 'Present',
+    absent: 'Absent',
+    halfday: 'Half Day',
+    leave: 'Leave',
+    'auto-punch-out': 'Auto Punch Out',
+    holiday: 'Holiday',
+    'weekly-off': 'Weekly Off',
+    'work-from-home': 'Work From Home',
+  };
+
+  return labels[status || 'absent'] || 'Absent';
+};
+
+const formatDuration = (totalSeconds: number) => {
+  const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+  const hours = Math.floor(safeSeconds / 3600);
+  const minutes = Math.floor((safeSeconds % 3600) / 60);
+  const seconds = safeSeconds % 60;
+  return [
+    String(hours).padStart(2, '0'),
+    String(minutes).padStart(2, '0'),
+    String(seconds).padStart(2, '0'),
+  ].join(':');
+};
+
+const getWorkingTime = (checkIn: string | null, checkOut: string | null, savedWorkingHours: number) => {
+  if (!checkIn) return '-';
+
+  if (checkOut) {
+    return formatDuration(savedWorkingHours * 60 * 60);
+  }
+
+  const checkInTime = new Date(checkIn).getTime();
+  if (Number.isNaN(checkInTime)) return '-';
+  const currentTime = Date.now();
+  const seconds = (currentTime - checkInTime) / 1000;
+  return formatDuration(seconds);
 };
 
 const Attendance = () => {
@@ -34,6 +70,7 @@ const Attendance = () => {
   const [loading, setLoading] = useState(false);
   const [employees, setEmployees] = useState<EmployeeAttendanceRow[]>([]);
   const [totalPages, setTotalPages] = useState(1);
+  const [, setCurrentTime] = useState(Date.now());
 
   const fetchEmployees = async () => {
     try {
@@ -46,9 +83,12 @@ const Attendance = () => {
           id: employee.id,
           name: employee.name,
           designation: employee.designation || '-',
-          status: todayAttendance?.status || 'Absent',
-          checkIn: formatTime(todayAttendance?.checkIn),
-          checkOut: formatTime(todayAttendance?.checkOut),
+          status: todayAttendance?.status || 'absent',
+          checkIn: formatISTTime(todayAttendance?.checkIn),
+          checkOut: formatISTTime(todayAttendance?.checkOut),
+          checkInRaw: todayAttendance?.checkIn || null,
+          checkOutRaw: todayAttendance?.checkOut || null,
+          workingHours: Number(todayAttendance?.workingHours || 0),
         };
       });
 
@@ -70,6 +110,14 @@ const Attendance = () => {
     return () => clearTimeout(timer);
   }, [search, page]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const columns = [
     { key: 'name', title: 'Employee Name' },
     { key: 'designation', title: 'Designation' },
@@ -77,18 +125,31 @@ const Attendance = () => {
       key: 'status',
       title: 'Today Status',
       render: (value: unknown) => (
-        <StatusBadge status={value as string} />
+        <StatusBadge status={formatStatus(value as string)} />
       ),
     },
     { key: 'checkIn', title: 'Check In' },
     { key: 'checkOut', title: 'Check Out' },
+    {
+      key: 'workingHours',
+      title: 'Working Hours',
+      render: (_: unknown, row: EmployeeAttendanceRow) => (
+        <span>
+          {getWorkingTime(
+            row.checkInRaw,
+            row.checkOutRaw,
+            row.workingHours
+          )}
+        </span>
+      ),
+    },
     {
       key: 'action',
       title: 'Action',
       render: (_: unknown, row: EmployeeAttendanceRow) => (
         <button
           onClick={() => navigate(`/attendance/${row.id}`)}
-           className="text-blue-600 hover:text-blue-800"
+          className="text-blue-600 hover:text-blue-800"
           title="View"
         >
           <FiEye size={18} />
@@ -97,11 +158,15 @@ const Attendance = () => {
     },
   ];
 
+  if (loading) {
+    return <PageLoader text='Loading Attendance List...' />
+  }
+
   return (
     <div>
       <div className="flex items-start justify-between">
         <PageHeader title="Attendance" />
-        <Breadcrumb/>
+        <Breadcrumb />
       </div>
 
       <div className="space-y-5">

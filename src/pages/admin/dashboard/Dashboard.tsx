@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-// import { useLocation } from 'react-router-dom';
-import { Users, UserCheck, UserX, Calendar, ClipboardList, RefreshCw, } from 'lucide-react';
+import { Users, UserCheck, UserX, Calendar, ClipboardList, } from 'lucide-react';
 import PageHeader from '@/components/common/Header/PageHeader';
 import StatCard from '@/components/common/StatCard/StatCard';
 import Breadcrumb from '@/components/common/Breadcrumb/Breadcrumb';
@@ -8,6 +7,7 @@ import DataTable from '@/components/ui/Table/DataTable';
 import AttendanceChart, { type AttendanceChartItem, } from './widgets/AttendanceChart';
 import LeaveChart, { type LeaveChartItem, } from './widgets/LeaveChart';
 import { getDashboardDetails, type DashboardData, } from '@/services/admin.service';
+import PageLoader from '@/components/common/Loader/PageLoader';
 
 const DEFAULT_ATTENDANCE_DATA: AttendanceChartItem[] = [
   { day: 'Mon', present: 0 },
@@ -20,12 +20,8 @@ const DEFAULT_ATTENDANCE_DATA: AttendanceChartItem[] = [
 ];
 
 const Dashboard = () => {
-  // const location = useLocation();
-  // const pathnames = location.pathname.split('/').filter(Boolean);
-  // const breadcrumbItems = [...pathnames];
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  // const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
 
   const loadDashboardData = useCallback(async () => {
@@ -50,15 +46,6 @@ const Dashboard = () => {
     };
     fetchDashboard();
   }, [loadDashboardData]);
-
-  // const handleRefresh = async () => {
-  //   try {
-  //     setRefreshing(true);
-  //     await loadDashboardData();
-  //   } finally {
-  //     setRefreshing(false);
-  //   }
-  // };
 
   const stats = [
     {
@@ -102,24 +89,19 @@ const Dashboard = () => {
   ];
 
   if (loading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="flex items-center gap-3 text-gray-500">
-          <RefreshCw size={20} className="animate-spin" />
-          Loading dashboard...
-        </div>
-      </div>
-    );
-  }
+  return <PageLoader text="Loading dashboard details..." />;
+}
 
   if (error) {
     return (
-      <div className="flex min-h-[400px] flex-col items-center justify-center gap-4">
-        <p className="text-red-500">{error}</p>
+      <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 px-4 text-center">
+        <p className="text-sm text-red-500 sm:text-base">
+          {error}
+        </p>
 
         <button
-          // onClick={handleRefresh}
-          className="rounded-lg bg-[#7F26FD] px-4 py-2 text-sm font-medium text-white"
+          onClick={loadDashboardData}
+          className="rounded-lg bg-[#7F26FD] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
         >
           Try Again
         </button>
@@ -128,29 +110,16 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between">
+    <div className="space-y-5 px-3 pb-6 sm:space-y-6 sm:px-5 lg:px-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <PageHeader title="Dashboard" />
 
-        <div className="flex items-center gap-3">
-          {/* <button
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className="flex items-center gap-2 rounded-lg border bg-white px-3 py-2 text-sm font-medium hover:bg-gray-50 disabled:opacity-60"
-          >
-            <RefreshCw
-              size={16}
-              className={refreshing ? 'animate-spin' : ''}
-            />
-            Refresh
-          </button> */}
-
+        <div className="w-full sm:w-auto">
           <Breadcrumb />
         </div>
       </div>
 
-      {/* STATS */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-4 xl:gap-6">
         {stats.map((item) => (
           <StatCard
             key={item.title}
@@ -161,62 +130,71 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* CHARTS */}
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <AttendanceChart data={attendanceData} />
+      <div className="grid grid-cols-1 gap-4 lg:gap-6 xl:grid-cols-2">
+        <div className="min-w-0 overflow-hidden rounded-2xl">
+          <AttendanceChart data={attendanceData} />
+        </div>
 
-        <LeaveChart data={leaveData} />
+        <div className="min-w-0 overflow-hidden rounded-2xl">
+          <LeaveChart data={leaveData} />
+        </div>
       </div>
 
-      {/* HOLIDAYS TABLE */}
-      <div className="rounded-2xl border bg-white p-6">
-        <div className="mb-5 flex items-center gap-2">
-          <Calendar size={20} className="text-[#7F26FD]" />
+      <div className="rounded-xl border bg-white p-4 sm:rounded-2xl sm:p-6">
+        <div className="mb-4 flex items-center gap-2 sm:mb-5">
+          <Calendar
+            size={20}
+            className="shrink-0 text-[#7F26FD]"
+          />
 
-          <h2 className="text-lg font-semibold">
+          <h2 className="text-base font-semibold sm:text-lg">
             Upcoming Holidays
           </h2>
         </div>
 
         {dashboardData?.upcomingHolidays?.length ? (
-          <DataTable
-            columns={holidayColumns}
-            data={dashboardData.upcomingHolidays}
-          />
+          <div className="w-full overflow-x-auto">
+            <DataTable
+              columns={holidayColumns}
+              data={dashboardData.upcomingHolidays}
+            />
+          </div>
         ) : (
-          <div className="py-10 text-center text-sm text-gray-500">
+          <div className="py-8 text-center text-sm text-gray-500 sm:py-10">
             No upcoming holidays available.
           </div>
         )}
       </div>
 
-      {/* PENDING REQUESTS */}
-      <div className="rounded-2xl border bg-white p-6">
-        <div className="mb-5 flex items-center gap-2">
-          <ClipboardList size={20} className="text-[#7F26FD]" />
+      <div className="rounded-xl border bg-white p-4 sm:rounded-2xl sm:p-6">
+        <div className="mb-4 flex items-center gap-2 sm:mb-5">
+          <ClipboardList
+            size={20}
+            className="shrink-0 text-[#7F26FD]"
+          />
 
-          <h2 className="text-lg font-semibold">
+          <h2 className="text-base font-semibold sm:text-lg">
             Pending Requests
           </h2>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="flex items-center justify-between rounded-xl bg-gray-50 p-5">
-            <span className="font-medium">
+          <div className="flex items-center justify-between rounded-xl bg-gray-50 p-4 sm:p-5">
+            <span className="text-sm font-medium sm:text-base">
               Leave Requests
             </span>
 
-            <span className="text-2xl font-bold text-[#7F26FD]">
+            <span className="text-xl font-bold text-[#7F26FD] sm:text-2xl">
               {dashboardData?.pendingRequest?.leaveRequest ?? 0}
             </span>
           </div>
 
-          <div className="flex items-center justify-between rounded-xl bg-gray-50 p-5">
-            <span className="font-medium">
+          <div className="flex items-center justify-between rounded-xl bg-gray-50 p-4 sm:p-5">
+            <span className="text-sm font-medium sm:text-base">
               WFH Requests
             </span>
 
-            <span className="text-2xl font-bold text-[#7F26FD]">
+            <span className="text-xl font-bold text-[#7F26FD] sm:text-2xl">
               {dashboardData?.pendingRequest?.wfhReqests ?? 0}
             </span>
           </div>

@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Breadcrumb from '@/components/common/Breadcrumb/Breadcrumb';
 import PageHeader from '@/components/common/Header/PageHeader';
+import PageLoader from '@/components/common/Loader/PageLoader';
 import DataTable from '@/components/ui/Table/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge/StatusBadge';
-import { getAttendanceStatus, getEmployeeAttendance, } from '@/services/admin.service';
+import { getAttendanceStatus, getEmployeeAttendance, getEmployeeDetails, } from '@/services/admin.service';
 import { formatISTTime } from '@/utils/dateTime';
 interface AttendanceRecord {
   id: number;
@@ -30,6 +31,7 @@ interface AttendanceStatusSummary {
   workingDays: number;
   attendancePercentage: string;
 }
+
 interface MonthlyAttendanceRow {
   id: number | string;
   date: string;
@@ -51,7 +53,6 @@ const formatStatus = (status: string) => {
 
   return labels[status] || status;
 };
-
 
 const getMonthAttendanceRows = (
   month: number,
@@ -122,6 +123,7 @@ const getMonthAttendanceRows = (
 const EmployeeAttendanceDetails = () => {
   const navigate = useNavigate();
   const { employeeId } = useParams();
+  const [employeeName, setEmployeeName] = useState('');
   const currentDate = new Date();
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   const [year, setYear] = useState(currentDate.getFullYear());
@@ -130,34 +132,50 @@ const EmployeeAttendanceDetails = () => {
   const [holidayDates, setHolidayDates] = useState<string[]>([]);
   const [summary, setSummary] = useState<AttendanceStatusSummary | null>(null);
   const [loading, setLoading] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
 
-  const fetchAttendanceDetails = async () => {
-    if (!employeeId) return;
+  const fetchAttendanceDetails = useCallback(async () => {
+    if (!employeeId) {
+      setFirstLoad(false);
+      return;
+    }
 
     try {
       setLoading(true);
-      const [attendanceResponse, statusResponse] = await Promise.all([
+
+      const [
+        attendanceResponse,
+        statusResponse,
+        employeeResponse,
+      ] = await Promise.all([
         getEmployeeAttendance(Number(employeeId)),
         getAttendanceStatus(Number(employeeId), month, year),
+        getEmployeeDetails(Number(employeeId)),
       ]);
+
       setAttendance(attendanceResponse?.attendance || []);
       setWeeklyOffDates(statusResponse?.weeklyOffDates || []);
       setHolidayDates(statusResponse?.holidayDates || []);
       setSummary(statusResponse?.status || null);
+
+      setEmployeeName(employeeResponse?.employee?.name || '');
     } catch (error) {
       console.error('Failed to fetch attendance details:', error);
+
       setAttendance([]);
       setWeeklyOffDates([]);
       setHolidayDates([]);
       setSummary(null);
+      setEmployeeName('');
     } finally {
       setLoading(false);
+      setFirstLoad(false);
     }
-  };
+  }, [employeeId, month, year]);
 
   useEffect(() => {
     fetchAttendanceDetails();
-  }, [employeeId, month, year]);
+  }, [fetchAttendanceDetails]);
 
   const monthlyRows = useMemo(() => {
     return getMonthAttendanceRows(
@@ -169,199 +187,221 @@ const EmployeeAttendanceDetails = () => {
     );
   }, [month, year, attendance, weeklyOffDates, holidayDates]);
 
-  const columns = [
+  const columns = useMemo(
+    () => [
+      {
+        key: 'date' as keyof MonthlyAttendanceRow,
+        title: 'Date',
+        render: (value: unknown) => (
+          <span className="whitespace-nowrap">
+            {value as string}
+          </span>
+        ),
+      },
+      {
+        key: 'status' as keyof MonthlyAttendanceRow,
+        title: 'Status',
+        render: (value: unknown) => (
+          <StatusBadge status={formatStatus(value as string)} />
+        ),
+      },
+      {
+        key: 'checkIn' as keyof MonthlyAttendanceRow,
+        title: 'Check In',
+        render: (value: unknown) => (
+          <span className="whitespace-nowrap">
+            {value as string}
+          </span>
+        ),
+      },
+      {
+        key: 'checkOut' as keyof MonthlyAttendanceRow,
+        title: 'Check Out',
+        render: (value: unknown) => (
+          <span className="whitespace-nowrap">
+            {value as string}
+          </span>
+        ),
+      },
+      {
+        key: 'workingHours' as keyof MonthlyAttendanceRow,
+        title: 'Working Hours',
+        render: (value: unknown) => `${value ?? 0} hrs`,
+      },
+    ],
+    []
+  );
+
+  const summaryCards = [
     {
-      key: 'date' as keyof MonthlyAttendanceRow,
-      title: 'Date',
+      label: 'Present',
+      value: summary?.present ?? 0,
+      className: 'bg-purple-50 border-purple-100',
+      labelClassName: 'text-purple-700',
     },
     {
-      key: 'status' as keyof MonthlyAttendanceRow,
-      title: 'Status',
-      render: (value: unknown) => (
-        <StatusBadge status={formatStatus(value as string)} />
-      ),
+      label: 'Absent',
+      value: summary?.absent ?? 0,
+      className: 'bg-white border-purple-100',
+      labelClassName: 'text-gray-600',
     },
     {
-      key: 'checkIn' as keyof MonthlyAttendanceRow,
-      title: 'Check In',
+      label: 'Leave',
+      value: summary?.leave ?? 0,
+      className: 'bg-purple-50 border-purple-100',
+      labelClassName: 'text-purple-700',
     },
     {
-      key: 'checkOut' as keyof MonthlyAttendanceRow,
-      title: 'Check Out',
+      label: 'Weekly Off',
+      value: summary?.weeklyOff ?? 0,
+      className: 'bg-white border-purple-100',
+      labelClassName: 'text-gray-600',
     },
     {
-      key: 'workingHours' as keyof MonthlyAttendanceRow,
-      title: 'Working Hours',
-      render: (value: unknown) => `${value ?? 0} hrs`,
+      label: 'Holiday',
+      value: summary?.holiday ?? 0,
+      className: 'bg-purple-50 border-purple-100',
+      labelClassName: 'text-purple-700',
+    },
+    {
+      label: 'Work From Home',
+      value: summary?.wfh ?? 0,
+      className: 'bg-white border-purple-100',
+      labelClassName: 'text-gray-600',
+    },
+    {
+      label: 'Working Days',
+      value: summary?.workingDays ?? 0,
+      className: 'bg-purple-50 border-purple-100',
+      labelClassName: 'text-purple-700',
+    },
+    {
+      label: 'Attendance Percentage',
+      value: `${summary?.attendancePercentage ?? '0.00'}%`,
+      className: 'bg-white border-purple-100',
+      labelClassName: 'text-gray-600',
     },
   ];
 
+  if (firstLoad && loading) {
+    return <PageLoader text="Loading attendance details..." />;
+  }
+
   return (
-    <div>
-      <div className="flex items-start justify-between">
-        <PageHeader title="Employee Attendance Details" />
-        <Breadcrumb />
+    <div className="mx-auto w-full min-w-0 max-w-7xl space-y-4 sm:space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <PageHeader
+            title="Employee Attendance Details"
+          // subtitle={ employeeName   ? `Attendance record of ${employeeName}`   : 'Employee attendance record' }
+          />
+
+          {employeeName && (
+            <div className="mt-2 inline-flex max-w-full items-center rounded-lg bg-[#F4EDFF] px-3 py-2 text-sm font-medium text-[#7F26FD] sm:text-base">
+              <span className="mr-1 shrink-0 text-gray-600">
+                Employee:
+              </span>
+
+              <span className="truncate">
+                {employeeName}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="w-full sm:w-auto">
+          <Breadcrumb />
+        </div>
       </div>
 
-      <div className="mt-5 space-y-5">
-        {/* Month, Year and Back Button */}
-        <div
-          className="
-            flex
-            flex-wrap
-            items-center
-            justify-between
-            gap-4
-            rounded-2xl
-            border
-            border-gray-100
-            bg-white
-            p-5
-            shadow-sm
-          "
-        >
-          <div className="flex flex-wrap gap-3">
-            <select
-              value={month}
-              onChange={(event) => setMonth(Number(event.target.value))}
-              className="
-                rounded-xl
-                border
-                border-purple-200
-                bg-purple-50
-                px-4
-                py-2.5
-                text-sm
-                font-medium
-                text-gray-700
-                outline-none
-                focus:border-[#7F26FD]
-              "
-            >
-              {Array.from({ length: 12 }, (_, index) => (
-                <option key={index + 1} value={index + 1}>
-                  {new Date(year, index, 1).toLocaleString('en-IN', {
-                    month: 'long',
-                  })}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={year}
-              onChange={(event) => setYear(Number(event.target.value))}
-              className="
-                rounded-xl
-                border
-                border-purple-200
-                bg-purple-50
-                px-4
-                py-2.5
-                text-sm
-                font-medium
-                text-gray-700
-                outline-none
-                focus:border-[#7F26FD]
-              "
-            >
-              {[2025, 2026, 2027].map((yearOption) => (
-                <option key={yearOption} value={yearOption}>
-                  {yearOption}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
+      <div
+        className="
+          flex flex-col gap-4 rounded-xl border border-gray-100
+          bg-white p-4 shadow-sm
+          sm:rounded-2xl sm:p-5
+          lg:flex-row lg:items-center lg:justify-between
+        "
+      >
+        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:w-auto">
+          <select
+            value={month}
+            onChange={(event) => setMonth(Number(event.target.value))}
             className="
-              rounded-xl
-              bg-[#7F26FD]
-              px-5
-              py-2.5
-              text-sm
-              font-medium
-              text-white
-              transition
-              hover:opacity-90
+              w-full rounded-xl border border-purple-200
+              bg-purple-50 px-4 py-2.5 text-sm font-medium text-gray-700
+              outline-none focus:border-[#7F26FD]
+              sm:min-w-[180px]
             "
           >
-            Back
-          </button>
+            {Array.from({ length: 12 }, (_, index) => (
+              <option key={index + 1} value={index + 1}>
+                {new Date(year, index, 1).toLocaleString('en-IN', {
+                  month: 'long',
+                })}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={year}
+            onChange={(event) => setYear(Number(event.target.value))}
+            className="
+              w-full rounded-xl border border-purple-200
+              bg-purple-50 px-4 py-2.5 text-sm font-medium text-gray-700
+              outline-none focus:border-[#7F26FD]
+              sm:min-w-[140px]
+            "
+          >
+            {[2025, 2026, 2027].map((yearOption) => (
+              <option key={yearOption} value={yearOption}>
+                {yearOption}
+              </option>
+            ))}
+          </select>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl border border-purple-100 bg-purple-50 p-5 shadow-sm">
-            <p className="text-sm font-medium text-purple-700">Present</p>
-            <p className="mt-2 text-3xl font-bold text-[#7F26FD]">
-              {summary?.present ?? 0}
-            </p>
-          </div>
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="
+            w-full rounded-xl bg-[#7F26FD] px-5 py-2.5
+            text-sm font-medium text-white transition hover:opacity-90
+            sm:w-auto sm:min-w-[120px]
+          "
+        >
+          Back
+        </button>
+      </div>
 
-          <div className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-600">Absent</p>
-            <p className="mt-2 text-3xl font-bold text-[#7F26FD]">
-              {summary?.absent ?? 0}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+        {summaryCards.map((card) => (
+          <div
+            key={card.label}
+            className={`
+              min-w-0 rounded-xl border p-4 shadow-sm
+              sm:rounded-2xl sm:p-5
+              ${card.className}
+            `}
+          >
+            <p className={`truncate text-sm font-medium ${card.labelClassName}`}>
+              {card.label}
             </p>
-          </div>
 
-          <div className="rounded-2xl border border-purple-100 bg-purple-50 p-5 shadow-sm">
-            <p className="text-sm font-medium text-purple-700">Leave</p>
-            <p className="mt-2 text-3xl font-bold text-[#7F26FD]">
-              {summary?.leave ?? 0}
+            <p className="mt-2 break-words text-2xl font-bold text-[#7F26FD] sm:text-3xl">
+              {card.value}
             </p>
           </div>
+        ))}
+      </div>
 
-          <div className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-600">Weekly Off</p>
-            <p className="mt-2 text-3xl font-bold text-[#7F26FD]">
-              {summary?.weeklyOff ?? 0}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-purple-100 bg-purple-50 p-5 shadow-sm">
-            <p className="text-sm font-medium text-purple-700">Holiday</p>
-            <p className="mt-2 text-3xl font-bold text-[#7F26FD]">
-              {summary?.holiday ?? 0}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-600">
-              Work From Home
-            </p>
-            <p className="mt-2 text-3xl font-bold text-[#7F26FD]">
-              {summary?.wfh ?? 0}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-purple-100 bg-purple-50 p-5 shadow-sm">
-            <p className="text-sm font-medium text-purple-700">
-              Working Days
-            </p>
-            <p className="mt-2 text-3xl font-bold text-[#7F26FD]">
-              {summary?.workingDays ?? 0}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-gray-600">
-              Attendance Percentage
-            </p>
-            <p className="mt-2 text-3xl font-bold text-[#7F26FD]">
-              {summary?.attendancePercentage ?? '0.00'}%
-            </p>
-          </div>
+      <div className="w-full overflow-x-auto rounded-xl border bg-white shadow-sm">
+        <div className="min-w-[720px]">
+          <DataTable<MonthlyAttendanceRow>
+            columns={columns}
+            data={monthlyRows}
+            loading={loading}
+          />
         </div>
-
-        {/* Your reusable DataTable */}
-        <DataTable<MonthlyAttendanceRow>
-          columns={columns}
-          data={monthlyRows}
-          loading={loading}
-        />
       </div>
     </div>
   );

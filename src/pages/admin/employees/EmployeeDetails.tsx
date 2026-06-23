@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import PageHeader from '@/components/common/Header/PageHeader';
 import { getEmployeeDetails } from '@/services/admin.service';
+import PageLoader from '@/components/common/Loader/PageLoader';
 
 const EmployeeDetails = () => {
   const { id } = useParams();
@@ -10,7 +11,7 @@ const EmployeeDetails = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchEmployee = async () => {
       try {
         setLoading(true);
         const res = await getEmployeeDetails(Number(id));
@@ -21,80 +22,96 @@ const EmployeeDetails = () => {
         setLoading(false);
       }
     };
-    fetch();
+
+    fetchEmployee();
   }, [id]);
 
   if (loading || !data) {
     return (
-      <div className="p-6 text-gray-500">
+      <div className="flex min-h-[300px] items-center justify-center px-4 text-sm text-gray-500 sm:text-base">
         Loading employee details...
       </div>
     );
   }
 
-  return (
-    <div className="space-y-6">
+  if (loading) {
+    return <PageLoader text='Loading employee details...' />
+  }
 
-      <div className="flex justify-between items-center">
+  return (
+    <div className="mx-auto w-full max-w-6xl space-y-4 sm:space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <PageHeader title="Employee Profile" />
 
-        <div className="flex gap-2">
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:gap-2">
           <button
+            type="button"
             onClick={() => navigate(-1)}
-            className="px-4 py-2 border rounded-lg"
+            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 sm:w-auto"
           >
             Back
           </button>
 
           <button
+            type="button"
             onClick={() => navigate(`/employees/edit/${id}`)}
-            className="px-4 py-2 bg-[#7F26FD] text-white rounded-lg"
+            className="w-full rounded-lg bg-[#7F26FD] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#6a1ee0] sm:w-auto"
           >
             Edit
           </button>
         </div>
       </div>
 
-      <div className="bg-white border rounded-2xl shadow-sm p-6">
-
-        <div className="flex items-center gap-5 border-b pb-5">
-
-          <div className="w-16 h-16 rounded-full bg-[#7F26FD] flex items-center justify-center text-white text-xl font-bold">
-            {data.name?.charAt(0)}
+      <div className="rounded-xl border bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6 lg:p-8">
+        <div className="flex flex-col gap-4 border-b pb-5 xs:flex-row xs:items-center sm:gap-5">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#7F26FD] text-xl font-bold text-white">
+            {data.name?.charAt(0)?.toUpperCase() || 'E'}
           </div>
 
-          <div>
-            <h2 className="text-xl font-semibold">{data.name}</h2>
-            <p className="text-gray-500">{data.designation || '-'}</p>
-            <p className="text-sm text-gray-400">{data.email}</p>
-          </div>
+          <div className="min-w-0">
+            <h2 className="break-words text-lg font-semibold text-gray-800 sm:text-xl">
+              {data.name || '-'}
+            </h2>
 
+            <p className="break-words text-sm text-gray-500 sm:text-base">
+              {data.designation || '-'}
+            </p>
+
+            <p className="break-all text-sm text-gray-400">
+              {data.email || '-'}
+            </p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-
-          <div className="space-y-2">
-            <p className="text-gray-500 text-sm">Phone</p>
-            <p className="font-medium">{data.phone || '-'}</p>
+        <div className="mt-5 grid grid-cols-1 gap-5 sm:mt-6 sm:gap-6 md:grid-cols-2">
+          <div className="min-w-0 space-y-1.5">
+            <p className="text-sm text-gray-500">Phone</p>
+            <p className="break-words font-medium text-gray-800">
+              {data.phone || '-'}
+            </p>
           </div>
 
-          <div className="space-y-2">
-            <p className="text-gray-500 text-sm">Role</p>
-            <p className="font-medium">{data.role?.name || '-'}</p>
+          <div className="min-w-0 space-y-1.5">
+            <p className="text-sm text-gray-500">Role</p>
+            <p className="break-words font-medium text-gray-800">
+              {data.role?.name || '-'}
+            </p>
           </div>
 
-          <div className="space-y-2">
-            <p className="text-gray-500 text-sm">Designation</p>
-            <p className="font-medium">{data.designation || '-'}</p>
+          <div className="min-w-0 space-y-1.5">
+            <p className="text-sm text-gray-500">Designation</p>
+            <p className="break-words font-medium text-gray-800">
+              {data.designation || '-'}
+            </p>
           </div>
 
-          <div className="space-y-2">
-            <p className="text-gray-500 text-sm">Email</p>
-            <p className="font-medium">{data.email}</p>
+          <div className="min-w-0 space-y-1.5">
+            <p className="text-sm text-gray-500">Email</p>
+            <p className="break-all font-medium text-gray-800">
+              {data.email || '-'}
+            </p>
           </div>
-
         </div>
-
       </div>
     </div>
   );

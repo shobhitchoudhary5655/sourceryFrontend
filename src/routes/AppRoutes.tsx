@@ -10,7 +10,6 @@ import { ROLES } from '@/utils/permissions';
 import Employees from '@/pages/admin/employees/EmployeeList';
 import Attendance from '@/pages/admin/attendance/AttendanceList';
 import LeaveRequests from '@/pages/admin/leaves/LeaveRequests';
-import { Settings } from 'lucide-react';
 import Profile from '@/pages/common/Profile/Profile';
 import Holidays from '@/pages/admin/holidays/HolidayList';
 import EmployeeAttendanceDetails from '@/pages/admin/attendance/AttendanceDetails';
@@ -20,6 +19,7 @@ import EditHoliday from '@/pages/admin/holidays/EditHoliday';
 import AddEmployee from '@/pages/admin/employees/AddEmployee';
 import EditEmployee from '@/pages/admin/employees/EditEmployee';
 import EmployeeDetails from '@/pages/admin/employees/EmployeeDetails';
+import Settings from '@/pages/admin/settings/Settings';
 
 const AppRoutes = () => {
     return (
@@ -37,18 +37,18 @@ const AppRoutes = () => {
                     <Route element={<MainLayout />}>
                         <Route path={ROUTES.ADMIN.DASHBOARD} element={<Dashboard />} />
                         <Route path={ROUTES.ADMIN.EMPLOYEES} element={<Employees />} />
-                        <Route path="/employees/add" element={<AddEmployee />} />
-                        <Route path="/employees/edit/:id" element={<EditEmployee />} />
-                        <Route path="/employees/:id" element={<EmployeeDetails />} />
+                        <Route path={ROUTES.ADMIN.ADDEMPLOYEE} element={<AddEmployee />} />
+                        <Route path={ROUTES.ADMIN.EDITEMPLOYEE} element={<EditEmployee />} />
+                        <Route path={ROUTES.ADMIN.DETAILSEMPLOYEE} element={<EmployeeDetails />} />
                         <Route path={ROUTES.ADMIN.ATTENDANCE} element={<Attendance />} />
                         <Route path={ROUTES.ADMIN.LEAVEREQUESTS} element={<LeaveRequests />} />
                         <Route path={ROUTES.ADMIN.HOLIDAYS} element={<Holidays />} />
-                        <Route path="/holidays/add" element={<AddHoliday />} />
-                        <Route path="/holidays/edit/:id" element={<EditHoliday />} />
+                        <Route path={ROUTES.ADMIN.ADDHOLIDAY} element={<AddHoliday />} />
+                        <Route path={ROUTES.ADMIN.EDITEMPLOYEE} element={<EditHoliday />} />
                         <Route path={ROUTES.ADMIN.EMPLOYEEATTENDANCEDETAILS} element={<EmployeeAttendanceDetails />} />
                         <Route path={ROUTES.PROFILE} element={<Profile />} />
                         <Route path={ROUTES.ADMIN.SETTINGS} element={<Settings />} />
-                        <Route path="/leave-requests/:id" element={<LeaveDetails />}
+                        <Route path={ROUTES.ADMIN.REQUESTSDETAILS} element={<LeaveDetails />}
                         />
                     </Route>
                 </Route>
