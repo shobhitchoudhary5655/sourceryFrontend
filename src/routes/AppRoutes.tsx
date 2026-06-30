@@ -20,6 +20,7 @@ import AddEmployee from '@/pages/admin/employees/AddEmployee';
 import EditEmployee from '@/pages/admin/employees/EditEmployee';
 import EmployeeDetails from '@/pages/admin/employees/EmployeeDetails';
 import Settings from '@/pages/admin/settings/Settings';
+import Salary from '@/pages/admin/salary/Salary';
 
 const AppRoutes = () => {
     return (
@@ -48,8 +49,8 @@ const AppRoutes = () => {
                         <Route path={ROUTES.ADMIN.EMPLOYEEATTENDANCEDETAILS} element={<EmployeeAttendanceDetails />} />
                         <Route path={ROUTES.PROFILE} element={<Profile />} />
                         <Route path={ROUTES.ADMIN.SETTINGS} element={<Settings />} />
-                        <Route path={ROUTES.ADMIN.REQUESTSDETAILS} element={<LeaveDetails />}
-                        />
+                        <Route path={ROUTES.ADMIN.REQUESTSDETAILS} element={<LeaveDetails />} />
+                        <Route path={ROUTES.ADMIN.SALARY} element={<Salary />} />
                     </Route>
                 </Route>
 

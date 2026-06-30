@@ -19,6 +19,7 @@ export const ROUTES = {
     HOLIDAYS: '/holidays',
     ADDHOLIDAY: "/holidays/add",
     EDITHOLIDAY: "/holidays/edit/:id",
+    SALARY: '/salary',
     SETTINGS: '/setting',
   },
 

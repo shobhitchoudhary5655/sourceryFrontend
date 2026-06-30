@@ -33,3 +33,9 @@ export const formatISTDateTime = (date?: string | null) => {
     hour12: true,
   }).format(new Date(date));
 };
+
+export const getMonthName = (month: number) => {
+    return new Date(2000, month - 1).toLocaleString("default", {
+        month: "long",
+    });
+};
