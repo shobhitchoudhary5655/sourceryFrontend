@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-
 import ProfileHeader from './ProfileHeader';
 import ProfileTabs from './ProfileTabs';
 import ProfileDetails from './ProfileDetails';
@@ -9,19 +8,32 @@ import RoleInfo from './RoleInfo';
 
 const Profile = () => {
   const { user } = useAuth();
-
   const [activeTab, setActiveTab] = useState('profile');
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto w-full max-w-6xl space-y-4 sm:space-y-6">
       <ProfileHeader user={user} />
 
-      <ProfileTabs
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      />
+      <div className="overflow-x-auto">
+        <ProfileTabs
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
+      </div>
 
-      <div className="bg-white rounded-2xl border p-6">
+      <div
+        className="
+          w-full
+          rounded-xl
+          border
+          bg-white
+          p-4
+          shadow-sm
+          sm:rounded-2xl
+          sm:p-6
+          lg:p-8
+        "
+      >
         {activeTab === 'profile' && (
           <ProfileDetails user={user} />
         )}
@@ -39,35 +51,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
-// import PageHeader from '@/components/common/Header/PageHeader';
-// import { useAuth } from '@/context/AuthContext';
-
-// const Profile = () => {
-//     const { user } = useAuth();
-
-//     return (
-//         <div>
-//             <PageHeader title="Profile" subtitle="Your account details" />
-//             <h1>Profile</h1>
-
-//             <p>Name: {user?.name}</p>
-//             <p>Email: {user?.email}</p>
-//             <p>Role: {user?.role}</p>
-
-//             {user?.role === 'admin' && (
-//                 <div>
-//                     <p>Admin Controls</p>
-//                 </div>
-//             )}
-
-//             {user?.role === 'hr' && (
-//                 <div>
-//                     <p>HR Dashboard Info</p>
-//                 </div>
-//             )}
-//         </div>
-//     );
-// };
-
-// export default Profile;

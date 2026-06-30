@@ -1,5 +1,5 @@
 import { ROUTES } from '@/routes/routes';
-import {LayoutDashboard,Users,Clock,Calendar,Shield,Settings,} from 'lucide-react';
+import {LayoutDashboard,Users,Clock,Calendar,Shield,Settings,Currency} from 'lucide-react';
 
 export const sidebarMenus = {
   ADMIN: [
@@ -28,11 +28,11 @@ export const sidebarMenus = {
       path: ROUTES.ADMIN.HOLIDAYS,
       icon: Shield,
     },
-    // {
-    //   name: '',
-    //   path: ROUTES.ADMIN.ROLES,
-    //   icon: Shield,
-    // },
+    {
+      name: 'Salary',
+      path: ROUTES.ADMIN.SALARY,
+      icon: Currency,
+    },
     {
       name: 'Settings',
       path: ROUTES.ADMIN.SETTINGS,
