@@ -19,7 +19,7 @@ export const sidebarMenus = {
       icon: Clock,
     },
     {
-      name: 'Leave',
+      name: 'Requests',
       path: ROUTES.ADMIN.LEAVEREQUESTS,
       icon: Shield,
     },

@@ -10,22 +10,7 @@ import GenerateSalaryModal from "@/components/ui/Modal/GenerateSalaryModal";
 import { getSalaryList, markSalaryPaid, createSalary } from '@/services/salary.service';
 import Toast from '@/components/ui/Toast/Toast';
 import { formatISTDate, getMonthName } from "@/utils/dateTime";
-
-type Salary = {
-    id: number;
-    salary: number;
-    month: number;
-    year: number;
-    status: string;
-    paidDate?: string | null;
-
-    user: {
-        id: number;
-        employeeId: string;
-        name: string;
-        designation?: string;
-    };
-};
+import type { Salary } from "@/services/salary.service";
 
 const Salary = () => {
     const [search, setSearch] = useState('');
@@ -51,10 +36,15 @@ const Salary = () => {
     const columns = useMemo(
         () => [
             {
-                key: 'employeeId',
-                title: 'Employee ID',
-                render: (_: unknown, row: Salary) => row.user.employeeId,
+                key: "sno",
+                title: "S No.",
+                render: (_value: unknown, _row: Salary, index: number) => (page - 1) * pageSize + index + 1,
             },
+            // {
+            //     key: 'employeeId',
+            //     title: 'Employee ID',
+            //     render: (_: unknown, row: Salary) => row.user.employeeId,
+            // },
 
             {
                 key: 'name',
@@ -69,9 +59,34 @@ const Salary = () => {
             },
 
             {
-                key: 'salary',
-                title: 'Salary',
-                render: (value: unknown) => `₹${Number(value).toLocaleString()}`,
+                key: "baseSalary",
+                title: "Base Salary",
+                render: (value: unknown) =>
+                    `₹${Number(value).toLocaleString("en-IN")}`,
+            },
+
+            {
+                key: "lopDays",
+                title: "Leave Days",
+            },
+
+            {
+                key: "wfhDeductionDays",
+                title: "WFH Days",
+            },
+
+            {
+                key: "deductionAmount",
+                title: "Deduction",
+                render: (value: unknown) =>
+                    `₹${Number(value).toLocaleString("en-IN")}`,
+            },
+
+            {
+                key: "salary",
+                title: "Net Salary",
+                render: (value: unknown) =>
+                    `₹${Number(value).toLocaleString("en-IN")}`,
             },
 
             {
