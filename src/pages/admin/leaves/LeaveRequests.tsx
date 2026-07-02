@@ -79,6 +79,11 @@ const LeaveRequests = () => {
   const columns = useMemo(
     () => [
       {
+        key: "sno",
+        title: "S No.",
+        render: (_value: unknown, _row: LeaveRow, index: number) => (page - 1) * pageSize + index + 1,
+      },
+      {
         key: 'name',
         title: 'Employee',
         render: (value: unknown) => (

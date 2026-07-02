@@ -97,7 +97,8 @@ function DataTable<T>({
                                     unknown
                                   >
                                 )[String(column.key)],
-                                row
+                                row,
+                                rowIndex
                               )
                             : String(
                                 (

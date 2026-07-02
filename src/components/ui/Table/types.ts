@@ -3,7 +3,8 @@ export interface Column<T> {
   title: string;
   render?: (
     value: unknown,
-    row: T
+    row: T,
+    index: number
   ) => React.ReactNode;
 }
 

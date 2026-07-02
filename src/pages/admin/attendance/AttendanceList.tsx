@@ -71,6 +71,7 @@ const Attendance = () => {
   const [employees, setEmployees] = useState<EmployeeAttendanceRow[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [, setCurrentTime] = useState(Date.now());
+  const pageSize = 10;
 
   const fetchEmployees = async () => {
     try {
@@ -83,7 +84,7 @@ const Attendance = () => {
           id: employee.id,
           name: employee.name,
           designation: employee.designation || '-',
-          status: todayAttendance?.status || 'absent',
+          status: todayAttendance?.status || '-',
           checkIn: formatISTTime(todayAttendance?.checkIn),
           checkOut: formatISTTime(todayAttendance?.checkOut),
           checkInRaw: todayAttendance?.checkIn || null,
@@ -119,6 +120,11 @@ const Attendance = () => {
   }, []);
 
   const columns = [
+    {
+      key: "sno",
+      title: "S No.",
+      render: (_value: unknown, _row: EmployeeAttendanceRow, index: number) => (page - 1) * pageSize + index + 1,
+    },
     { key: 'name', title: 'Employee Name' },
     { key: 'designation', title: 'Designation' },
     {

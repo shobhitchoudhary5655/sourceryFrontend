@@ -2,11 +2,14 @@ import api from './api';
 
 export interface Salary {
   id: number;
-  userId: number;
+  baseSalary: string;
+  salary: string;
   month: number;
   year: number;
-  salary: number;
-  status: 'Pending' | 'Paid';
+  lopDays: string;
+  wfhDeductionDays: string;
+  deductionAmount: string;
+  status: string;
   paidDate?: string | null;
 
   user: {

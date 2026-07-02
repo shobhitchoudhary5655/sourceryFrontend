@@ -112,7 +112,7 @@ const getMonthAttendanceRows = (
     return {
       id: `absent-${date}`,
       date,
-      status: 'absent',
+      status: '-',
       checkIn: '-',
       checkOut: '-',
       workingHours: 0,

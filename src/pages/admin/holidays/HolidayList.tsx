@@ -74,6 +74,11 @@ const Holidays = () => {
 
   const columns = useMemo(
     () => [
+       {
+        key: "sno",
+        title: "S No.",
+        render: (_value: unknown, _row: Holiday, index: number) => (page - 1) * pageSize + index + 1,
+      },
       {
         key: 'name',
         title: 'Holiday',

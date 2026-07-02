@@ -12,10 +12,12 @@ import PageLoader from '@/components/common/Loader/PageLoader';
 
 type Employee = {
   id: number;
+  employeeId: string;
   name: string;
   email: string;
   designation?: string;
   role?: string;
+  salary: string;
   status: string;
 };
 
@@ -33,6 +35,18 @@ const Employees = () => {
 
   const columns = useMemo(
     () => [
+      {
+        key: "sno",
+        title: "S No.",
+        render: (_value: unknown, _row: Employee, index: number) => (page - 1) * pageSize + index + 1,
+      },
+      {
+        key: "employeeId",
+        title: "Employee ID",
+        render: (value: unknown) => (
+          <span>{(value as string) || "-"}</span>
+        ),
+      },
       {
         key: 'name',
         title: 'Name',
@@ -53,6 +67,13 @@ const Employees = () => {
           <span className="whitespace-nowrap">
             {(value as string) || '-'}
           </span>
+        ),
+      },
+      {
+        key: "salary",
+        title: "Salary",
+        render: (value: unknown) => (
+          <span>₹{Number(value || 0).toLocaleString("en-IN")}</span>
         ),
       },
       {
