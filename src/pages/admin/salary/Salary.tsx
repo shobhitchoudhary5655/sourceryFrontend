@@ -10,7 +10,7 @@ import GenerateSalaryModal from "@/components/ui/Modal/GenerateSalaryModal";
 import { getSalaryList, markSalaryPaid, createSalary } from '@/services/salary.service';
 import Toast from '@/components/ui/Toast/Toast';
 import { formatISTDate, getMonthName } from "@/utils/dateTime";
-import type { Salary } from "@/services/salary.service";
+import type { Salary as SalaryType } from "@/services/salary.service";
 
 const Salary = () => {
     const [search, setSearch] = useState('');
@@ -19,7 +19,7 @@ const Salary = () => {
     const [status, setStatus] = useState('');
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
-    const [salaries, setSalaries] = useState<Salary[]>([]);
+    const [salaries, setSalaries] = useState<SalaryType[]>([]);
     const [totalPages, setTotalPages] = useState(1);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -38,7 +38,7 @@ const Salary = () => {
             {
                 key: "sno",
                 title: "S No.",
-                render: (_value: unknown, _row: Salary, index: number) => (page - 1) * pageSize + index + 1,
+                render: (_value: unknown, _row: SalaryType, index: number) => (page - 1) * pageSize + index + 1,
             },
             // {
             //     key: 'employeeId',
@@ -49,13 +49,13 @@ const Salary = () => {
             {
                 key: 'name',
                 title: 'Employee Name',
-                render: (_: unknown, row: Salary) => row.user.name,
+                render: (_: unknown, row: SalaryType) => row.user.name,
             },
 
             {
                 key: 'designation',
                 title: 'Designation',
-                render: (_: unknown, row: Salary) => row.user.designation || '-',
+                render: (_: unknown, row: SalaryType) => row.user.designation || '-',
             },
 
             {
@@ -118,7 +118,7 @@ const Salary = () => {
                 key: 'action',
                 title: 'Action',
 
-                render: (_: unknown, row: Salary) =>
+                render: (_: unknown, row: SalaryType) =>
                     row.status === 'Paid' ? (
                         <span className="font-semibold text-green-600">
                             Paid
