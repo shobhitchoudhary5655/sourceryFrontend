@@ -7,7 +7,7 @@ import TableSearch from '@/components/ui/Table/TableSearch';
 import StatusBadge from '@/components/ui/StatusBadge/StatusBadge';
 import ConfirmModal from '@/components/ui/Modal/ConfirmModal';
 import { getEmployees, deleteEmployee, } from '@/services/admin.service';
-import { FiEye, FiEdit, FiTrash2, } from 'react-icons/fi';
+import { FiEye, FiEdit, FiToggleLeft, FiToggleRight } from 'react-icons/fi';
 import PageLoader from '@/components/common/Loader/PageLoader';
 
 type Employee = {
@@ -30,7 +30,7 @@ const Employees = () => {
   const [loading, setLoading] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-
+  const selectedEmployee = employees.find((emp) => emp.id === selectedId);
   const pageSize = 10;
 
   const columns = useMemo(
@@ -120,16 +120,24 @@ const Employees = () => {
             </button>
 
             <button
-              type="button"
               onClick={() => {
                 setSelectedId(row.id);
                 setConfirmOpen(true);
               }}
-              className="rounded p-1.5 text-red-600 transition hover:bg-red-50 hover:text-red-800"
-              title="Delete employee"
-              aria-label="Delete employee"
+              className="rounded p-1.5 transition"
+              title={row.status === "Active" ? "Deactivate Employee" : "Activate Employee"}
             >
-              <FiTrash2 size={18} />
+              {row.status === "Active" ? (
+                <FiToggleRight
+                  size={22}
+                  className="text-green-600"
+                />
+              ) : (
+                <FiToggleLeft
+                  size={22}
+                  className="text-red-600"
+                />
+              )}
             </button>
           </div>
         ),
@@ -241,9 +249,9 @@ const Employees = () => {
 
       <ConfirmModal
         open={confirmOpen}
-        title="Delete Employee"
-        message="Are you sure you want to delete this employee?"
-        confirmText="Delete"
+        title={selectedEmployee?.status === "Active" ? "Deactivate Employee" : "Activate Employee"}
+        message={selectedEmployee?.status === "Active" ? "Are you sure you want to deactivate this employee?" : "Are you sure you want to activate this employee?"}
+        confirmText={selectedEmployee?.status === "Active" ? "Deactivate" : "Activate"}
         onCancel={() => {
           setConfirmOpen(false);
           setSelectedId(null);
