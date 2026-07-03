@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import PageHeader from '@/components/common/Header/PageHeader';
 import { getEmployeeDetails, updateEmployee, getRoles, } from '@/services/admin.service';
 import PageLoader from '@/components/common/Loader/PageLoader';
+import Toast from "@/components/ui/Toast/Toast";
 
 interface Employee {
   name: string;
@@ -17,6 +18,10 @@ interface Employee {
   workLocation?: string | null;
   employeeType?: string | null;
   profileImage?: string | null;
+  salary?: number | null;
+  status?: "Active" | "Inactive";
+  clBalance?: number | null;
+  slBalance?: number | null;
 }
 
 type EmployeeForm = {
@@ -33,11 +38,16 @@ type EmployeeForm = {
   workLocation: string;
   employeeType: string;
   profileImage: string;
+  salary: string;
+  status: string;
+  clBalance: string;
+  slBalance: string;
 };
 
 const EditEmployee = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [roles, setRoles] = useState<any[]>([]);
@@ -55,6 +65,15 @@ const EditEmployee = () => {
     workLocation: '',
     employeeType: '',
     profileImage: '',
+    salary: '',
+    status: 'Active',
+    clBalance: '',
+    slBalance: '',
+  });
+  const [toast, setToast] = useState({
+    open: false,
+    message: "",
+    type: "success" as "success" | "error",
   });
 
   useEffect(() => {
@@ -74,15 +93,15 @@ const EditEmployee = () => {
           roleId: emp.roleId ? String(emp.roleId) : '',
           employeeId: emp.employeeId ?? '',
           gender: emp.gender ?? '',
-          dateOfBirth: emp.dateOfBirth
-            ? emp.dateOfBirth.slice(0, 10)
-            : '',
-          joiningDate: emp.joiningDate
-            ? emp.joiningDate.slice(0, 10)
-            : '',
+          dateOfBirth: emp.dateOfBirth ? emp.dateOfBirth.slice(0, 10) : '',
+          joiningDate: emp.joiningDate ? emp.joiningDate.slice(0, 10) : '',
           workLocation: emp.workLocation ?? '',
           employeeType: emp.employeeType ?? '',
           profileImage: emp.profileImage ?? '',
+          salary: emp.salary ? String(emp.salary) : '',
+          status: emp.status ?? 'Active',
+          clBalance: emp.clBalance ? String(emp.clBalance) : '',
+          slBalance: emp.slBalance ? String(emp.slBalance) : '',
         });
       } catch (err) {
         console.error(err);
@@ -110,9 +129,15 @@ const EditEmployee = () => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
+    const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
     }));
   };
 
@@ -120,8 +145,89 @@ const EditEmployee = () => {
     form.name && form.email && form.roleId
   );
 
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!form.name.trim()) {
+      newErrors.name = "Full name is required.";
+    } else if (form.name.trim().length < 3) {
+      newErrors.name = "Name must be at least 3 characters.";
+    }
+
+    if (!form.email.trim()) {
+      newErrors.email = "Email is required.";
+    } else if (
+      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(form.email)
+    ) {
+      newErrors.email = "Enter a valid email.";
+    }
+
+    if (!form.employeeId.trim()) {
+      newErrors.employeeId = "Employee ID is required.";
+    }
+
+    if (!form.phone.trim()) {
+      newErrors.phone = "Phone number is required.";
+    } else if (!/^[6-9]\d{9}$/.test(form.phone)) {
+      newErrors.phone = "Enter a valid 10-digit phone number.";
+    }
+
+    if (!form.designation.trim()) {
+      newErrors.designation = "Designation is required.";
+    }
+
+    if (!form.roleId) {
+      newErrors.roleId = "Role is required.";
+    }
+
+    if (!form.gender) {
+      newErrors.gender = "Gender is required.";
+    }
+
+    if (!form.dateOfBirth) {
+      newErrors.dateOfBirth = "Date of birth is required.";
+    }
+
+    if (!form.joiningDate) {
+      newErrors.joiningDate = "Joining date is required.";
+    }
+
+    if (!form.workLocation.trim()) {
+      newErrors.workLocation = "Work location is required.";
+    }
+
+    if (!form.employeeType) {
+      newErrors.employeeType = "Employee type is required.";
+    }
+
+    if (!form.salary) {
+      newErrors.salary = "Salary is required.";
+    } else if (Number(form.salary) < 0) {
+      newErrors.salary = "Salary cannot be negative.";
+    }
+
+    if (!form.status) {
+      newErrors.status = "Status is required.";
+    }
+
+    if (Number(form.clBalance) < 0) {
+      newErrors.clBalance = "CL Balance cannot be negative.";
+    }
+    
+    if (Number(form.slBalance) < 0) {
+      newErrors.slBalance = "SL Balance cannot be negative.";
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async () => {
-    if (!isValid) return;
+    // if (!isValid) return;
+    if (!validateForm()) {
+      return;
+    }
 
     try {
       setSaving(true);
@@ -129,13 +235,28 @@ const EditEmployee = () => {
       const payload = {
         ...form,
         roleId: Number(form.roleId),
+        salary: form.salary ? Number(form.salary) : null,
+        clBalance: form.clBalance ? Number(form.clBalance) : 0,
+        slBalance: form.slBalance ? Number(form.slBalance) : 0,
       };
 
       await updateEmployee(Number(id), payload);
+      setToast({
+        open: true,
+        message: "Employee updated successfully.",
+        type: "success",
+      });
 
-      navigate('/employees');
+      setTimeout(() => {
+        navigate("/employees");
+      }, 1200);
     } catch (err) {
       console.error(err);
+      setToast({
+        open: true,
+        message: "Failed to update employee.",
+        type: "error",
+      });
     } finally {
       setSaving(false);
     }
@@ -179,6 +300,11 @@ const EditEmployee = () => {
               onChange={handleChange}
               className={inputClass}
             />
+            {errors.employeeId && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.employeeId}
+              </p>
+            )}
           </div>
 
           <div className="min-w-0">
@@ -197,6 +323,11 @@ const EditEmployee = () => {
               onChange={handleChange}
               className={inputClass}
             />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.name}
+              </p>
+            )}
           </div>
 
           <div className="min-w-0">
@@ -216,6 +347,11 @@ const EditEmployee = () => {
               onChange={handleChange}
               className={inputClass}
             />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.email}
+              </p>
+            )}
           </div>
 
           <div className="min-w-0">
@@ -235,6 +371,11 @@ const EditEmployee = () => {
               onChange={handleChange}
               className={inputClass}
             />
+            {errors.phone && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.phone}
+              </p>
+            )}
           </div>
 
           <div className="min-w-0">
@@ -253,6 +394,11 @@ const EditEmployee = () => {
               onChange={handleChange}
               className={inputClass}
             />
+            {errors.designation && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.designation}
+              </p>
+            )}
           </div>
 
           <div className="min-w-0">
@@ -275,6 +421,11 @@ const EditEmployee = () => {
               <option value="Female">Female</option>
               <option value="Other">Other</option>
             </select>
+            {errors.gender && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.gender}
+              </p>
+            )}
           </div>
 
           <div className="min-w-0">
@@ -311,6 +462,11 @@ const EditEmployee = () => {
               onChange={handleChange}
               className={inputClass}
             />
+            {errors.joiningDate && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.joiningDate}
+              </p>
+            )}
           </div>
 
           <div className="min-w-0">
@@ -329,6 +485,11 @@ const EditEmployee = () => {
               onChange={handleChange}
               className={inputClass}
             />
+            {errors.workLocation && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.workLocation}
+              </p>
+            )}
           </div>
 
           <div className="min-w-0">
@@ -351,6 +512,11 @@ const EditEmployee = () => {
               <option value="Contract">Contract</option>
               <option value="Intern">Intern</option>
             </select>
+            {errors.employeeType && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.employeeType}
+              </p>
+            )}
           </div>
 
           <div className="min-w-0">
@@ -376,6 +542,106 @@ const EditEmployee = () => {
                 </option>
               ))}
             </select>
+            {errors.roleId && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.roleId}
+              </p>
+            )}
+          </div>
+          <div className="min-w-0">
+            <label
+              htmlFor="salary"
+              className="text-sm font-medium text-gray-600"
+            >
+              Salary
+            </label>
+
+            <input
+              id="salary"
+              type="number"
+              name="salary"
+              value={form.salary}
+              onChange={handleChange}
+              className={inputClass}
+              placeholder="Enter salary"
+            />
+            {errors.salary && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.salary}
+              </p>
+            )}
+          </div>
+          <div className="min-w-0">
+            <label
+              htmlFor="status"
+              className="text-sm font-medium text-gray-600"
+            >
+              Status
+            </label>
+
+            <select
+              id="status"
+              name="status"
+              value={form.status}
+              onChange={handleChange}
+              className={inputClass}
+            >
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+            {errors.status && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.status}
+              </p>
+            )}
+          </div>
+
+          <div className="min-w-0">
+            <label
+              htmlFor="clBalance"
+              className="text-sm font-medium text-gray-600"
+            >
+              CL Balance
+            </label>
+
+            <input
+              id="clBalance"
+              type="number"
+              step="0.5"
+              name="clBalance"
+              value={form.clBalance}
+              onChange={handleChange}
+              className={inputClass}
+            />
+            {errors.clBalance && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.clBalance}
+              </p>
+            )}
+          </div>
+
+          <div className="min-w-0">
+            <label
+              htmlFor="slBalance"
+              className="text-sm font-medium text-gray-600"
+            >
+              SL Balance
+            </label>
+
+            <input
+              id="slBalance"
+              type="number"
+              step="0.5"
+              name="slBalance"
+              value={form.slBalance}
+              onChange={handleChange}
+              className={inputClass}
+            />
+            {errors.slBalance && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.slBalance}
+              </p>
+            )}
           </div>
         </div>
 
@@ -399,6 +665,17 @@ const EditEmployee = () => {
           </button>
         </div>
       </div>
+      <Toast
+        open={toast.open}
+        message={toast.message}
+        type={toast.type}
+        onClose={() =>
+          setToast((prev) => ({
+            ...prev,
+            open: false,
+          }))
+        }
+      />
     </div>
   );
 };
