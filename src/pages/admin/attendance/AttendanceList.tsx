@@ -34,7 +34,11 @@ const formatStatus = (status?: string) => {
     'work-from-home': 'Work From Home',
   };
 
-  return labels[status || 'absent'] || 'Absent';
+  if (!status || status === '-') {
+    return '-';
+  }
+
+  return labels[status] || '-';
 };
 
 const formatDuration = (totalSeconds: number) => {
