@@ -51,7 +51,11 @@ const formatStatus = (status: string) => {
     weeklyOff: 'Weekly Off',
   };
 
-  return labels[status] || status;
+  if (!status || status === '-') {
+    return '-';
+  }
+
+  return labels[status] || '-';
 };
 
 const getMonthAttendanceRows = (
@@ -201,9 +205,15 @@ const EmployeeAttendanceDetails = () => {
       {
         key: 'status' as keyof MonthlyAttendanceRow,
         title: 'Status',
-        render: (value: unknown) => (
-          <StatusBadge status={formatStatus(value as string)} />
-        ),
+        render: (value: unknown) => {
+          const status = formatStatus(value as string);
+
+          if (status === '-') {
+            return <span>-</span>;
+          }
+
+          return <StatusBadge status={status} />;
+        },
       },
       {
         key: 'checkIn' as keyof MonthlyAttendanceRow,

@@ -11,7 +11,7 @@ const LeaveDetails = () => {
   const navigate = useNavigate();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState<'approved' | 'rejected' | null>(null);
 
   const fetchLeave = useCallback(async () => {
     try {
@@ -37,7 +37,7 @@ const LeaveDetails = () => {
 
   const handleAction = async (status: 'approved' | 'rejected') => {
     try {
-      setActionLoading(true);
+      setActionLoading(status);
 
       await updateLeaveStatus(Number(id), status);
 
@@ -45,7 +45,7 @@ const LeaveDetails = () => {
     } catch (err) {
       console.error('Update leave status error:', err);
     } finally {
-      setActionLoading(false);
+      setActionLoading(null);
     }
   };
 
@@ -148,7 +148,7 @@ const LeaveDetails = () => {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          disabled={actionLoading}
+          disabled={actionLoading !== null}
           className="w-full rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
           Back
@@ -159,19 +159,23 @@ const LeaveDetails = () => {
             <button
               type="button"
               onClick={() => handleAction('rejected')}
-              disabled={actionLoading}
+              disabled={actionLoading !== null}
               className="w-full rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
             >
-              {actionLoading ? 'Processing...' : 'Reject'}
+              {actionLoading === 'rejected'
+                ? 'Processing...'
+                : 'Reject'}
             </button>
 
             <button
               type="button"
               onClick={() => handleAction('approved')}
-              disabled={actionLoading}
+              disabled={actionLoading !== null}
               className="w-full rounded-lg bg-green-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
             >
-              {actionLoading ? 'Processing...' : 'Approve'}
+              {actionLoading === 'approved'
+                ? 'Processing...'
+                : 'Approve'}
             </button>
           </>
         )}
