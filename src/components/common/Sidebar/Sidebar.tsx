@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { sidebarMenus } from '@/constants/menu';
@@ -8,7 +10,11 @@ interface SidebarProps {
 
 const Sidebar = ({ onClose }: SidebarProps) => {
   const { user } = useAuth();
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
 
+  const toggleMenu = (name: string) => {
+    setOpenMenu((prev) => (prev === name ? null : name));
+  };
   const role = user?.role?.toUpperCase();
 
   const menuItems =
@@ -31,8 +37,67 @@ const Sidebar = ({ onClose }: SidebarProps) => {
 
       {/* Menu */}
       <nav className="flex-1 space-y-2 overflow-y-auto p-4">
-        {menuItems.map((item) => {
+        {menuItems.map((item: any) => {
           const Icon = item.icon;
+
+          if (item.children) {
+            return (
+              <div key={item.name}>
+                <button
+                  type="button"
+                  onClick={() => toggleMenu(item.name)}
+                  className="
+            flex w-full items-center justify-between
+            rounded-xl border border-transparent
+            px-4 py-3 text-gray-600
+            transition hover:bg-[#F4EDFF]
+            hover:text-[#7F26FD]
+          "
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon size={20} />
+                    <span className="font-medium">{item.name}</span>
+                  </div>
+
+                  {openMenu === item.name ? (
+                    <ChevronDown size={18} />
+                  ) : (
+                    <ChevronRight size={18} />
+                  )}
+                </button>
+
+                {openMenu === item.name && (
+                  <div className="mt-2 ml-6 space-y-1 border-l border-gray-200 pl-4">
+                    {item.children.map((child: any) => {
+                      const ChildIcon = child.icon;
+
+                      return (
+                        <NavLink
+                          key={child.path}
+                          to={child.path}
+                          onClick={onClose}
+                          className={({ isActive }) =>
+                            `
+                      flex items-center gap-3 rounded-lg
+                      px-3 py-2 transition
+
+                      ${isActive
+                              ? "bg-[#7F26FD] text-white"
+                              : "text-gray-600 hover:bg-[#F4EDFF] hover:text-[#7F26FD]"
+                            }
+                    `
+                          }
+                        >
+                          <ChildIcon size={18} />
+                          <span>{child.name}</span>
+                        </NavLink>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          }
 
           return (
             <NavLink
@@ -41,23 +106,18 @@ const Sidebar = ({ onClose }: SidebarProps) => {
               onClick={onClose}
               className={({ isActive }) =>
                 `
-                  flex items-center gap-3 rounded-xl
-                  border px-4 py-3
-                  transition-all duration-200
+          flex items-center gap-3 rounded-xl border
+          px-4 py-3 transition-all
 
-                  ${
-                    isActive
-                      ? 'border-[#7F26FD] bg-[#7F26FD] text-white shadow-md'
-                      : 'border-transparent text-gray-600 hover:border-[#E9DDFF] hover:bg-[#F4EDFF] hover:text-[#7F26FD]'
-                  }
-                `
+          ${isActive
+                  ? "border-[#7F26FD] bg-[#7F26FD] text-white shadow-md"
+                  : "border-transparent text-gray-600 hover:border-[#E9DDFF] hover:bg-[#F4EDFF] hover:text-[#7F26FD]"
+                }
+        `
               }
             >
               <Icon size={20} />
-
-              <span className="font-medium">
-                {item.name}
-              </span>
+              <span className="font-medium">{item.name}</span>
             </NavLink>
           );
         })}

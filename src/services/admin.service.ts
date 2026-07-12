@@ -188,3 +188,42 @@ export const deleteEmployee = async (employeeId: number,) => {
     };
   }
 };
+
+export const getEmployeeDocuments = async (id: number) => {
+  const response = await api.get(`/admin/employees/${id}/documents`);
+  return response.data;
+};
+
+export const createAttendance = async (data: any) => {
+  const response = await api.post(
+    "/admin/attendance",
+    data
+  );
+
+  return response.data;
+};
+
+export const updateAttendance = async (
+  id: number,
+  data: any
+) => {
+  const response = await api.put(
+    `/admin/attendance/${id}`,
+    data
+  );
+
+  return response.data;
+};
+
+export const getAttendanceById = async (id: number) => {
+  const response = await api.get(`/admin/attendance/${id}`);
+  return response.data;
+};
+
+export const getDocumentViewUrl = async (id: number) => {
+    const response = await api.get(
+        `/upload/documents/${id}/view`
+    );
+
+    return response.data;
+};

@@ -7,6 +7,7 @@ import DataTable from '@/components/ui/Table/DataTable';
 import StatusBadge from '@/components/ui/StatusBadge/StatusBadge';
 import { getAttendanceStatus, getEmployeeAttendance, getEmployeeDetails, } from '@/services/admin.service';
 import { formatISTTime } from '@/utils/dateTime';
+import { FiEdit2 } from "react-icons/fi";
 interface AttendanceRecord {
   id: number;
   userId: number;
@@ -14,11 +15,16 @@ interface AttendanceRecord {
   checkIn: string | null;
   checkOut: string | null;
   status: string;
+  officeHours: number;
   workingHours: number;
   location: string | null;
-  notes: string | null;
-  createdAt: string;
-  updatedAt: string;
+  inOffice: boolean | null;
+  breaks: {
+    id: number;
+    startTime: string;
+    endTime: string | null;
+    durationMinutes: number;
+  }[];
 }
 
 interface AttendanceStatusSummary {
@@ -38,7 +44,11 @@ interface MonthlyAttendanceRow {
   status: string;
   checkIn: string;
   checkOut: string;
+  officeHours: number;
   workingHours: number;
+  location: string;
+  inOffice: boolean | null;
+  breakMinutes: number;
 }
 
 const formatStatus = (status: string) => {
@@ -81,13 +91,23 @@ const getMonthAttendanceRows = (
     const attendanceItem = attendanceMap.get(date);
 
     if (attendanceItem) {
+      const breakMinutes = attendanceItem.breaks.reduce(
+        (sum, item) =>
+          sum + (item.durationMinutes || 0),
+        0
+      );
+
       return {
         id: attendanceItem.id,
         date,
         status: attendanceItem.status,
         checkIn: formatISTTime(attendanceItem.checkIn),
         checkOut: formatISTTime(attendanceItem.checkOut),
+        officeHours: attendanceItem.officeHours || 0,
         workingHours: attendanceItem.workingHours || 0,
+        location: attendanceItem.location || "-",
+        inOffice: attendanceItem.inOffice,
+        breakMinutes,
       };
     }
 
@@ -98,7 +118,11 @@ const getMonthAttendanceRows = (
         status: 'holiday',
         checkIn: '-',
         checkOut: '-',
+        officeHours: 0,
         workingHours: 0,
+        breakMinutes: 0,
+        location: "-",
+        inOffice: null,
       };
     }
 
@@ -109,7 +133,11 @@ const getMonthAttendanceRows = (
         status: 'weeklyOff',
         checkIn: '-',
         checkOut: '-',
+        officeHours: 0,
         workingHours: 0,
+        breakMinutes: 0,
+        location: "-",
+        inOffice: null,
       };
     }
 
@@ -119,7 +147,11 @@ const getMonthAttendanceRows = (
       status: '-',
       checkIn: '-',
       checkOut: '-',
+      officeHours: 0,
       workingHours: 0,
+      breakMinutes: 0,
+      location: "-",
+      inOffice: null,
     };
   });
 };
@@ -191,6 +223,30 @@ const EmployeeAttendanceDetails = () => {
     );
   }, [month, year, attendance, weeklyOffDates, holidayDates]);
 
+  const formatHours = (hours: number) => {
+    const totalMinutes = Math.round(hours * 60);
+
+    const hrs = Math.floor(totalMinutes / 60);
+    const mins = totalMinutes % 60;
+
+    if (hrs === 0) {
+      return `${mins}m`;
+    }
+
+    return `${hrs}h ${mins}m`;
+  };
+
+  const formatBreak = (minutes: number) => {
+    const hrs = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+
+    if (hrs === 0) {
+      return `${mins}m`;
+    }
+
+    return `${hrs}h ${mins}m`;
+  };
+
   const columns = useMemo(
     () => [
       {
@@ -234,9 +290,64 @@ const EmployeeAttendanceDetails = () => {
         ),
       },
       {
-        key: 'workingHours' as keyof MonthlyAttendanceRow,
-        title: 'Working Hours',
-        render: (value: unknown) => `${value ?? 0} hrs`,
+        key: "officeHours",
+        title: "Office Hours",
+        render: (value: any) =>
+          formatHours(value),
+      },
+      {
+        key: "workingHours",
+        title: "Productive Hours",
+        render: (value: any) =>
+          formatHours(value),
+      },
+      {
+        key: "breakMinutes",
+        title: "Break",
+        render: (value: any) =>
+          formatBreak(value),
+      },
+      {
+        key: "location" as keyof MonthlyAttendanceRow,
+        title: "Location",
+        render: (value: unknown): React.ReactNode =>
+          value ? String(value) : "-",
+      },
+      {
+        key: "inOffice",
+        title: "In Office",
+        render: (value: unknown) => {
+          if (value === null) return "-";
+
+          return value ? (
+            <span className="text-green-600 font-semibold">
+              Yes
+            </span>
+          ) : (
+            <span className="text-red-600 font-semibold">
+              No
+            </span>
+          );
+        },
+      },
+      {
+        key: "action",
+        title: "Action",
+        render: (_: unknown, row: any) => {
+
+          if (typeof row.id !== "number") {
+            return "-";
+          }
+
+          return (
+            <button
+              onClick={() => navigate(`/attendance/${row.id}/edit`)}
+              className="text-blue-600 hover:text-blue-800"
+            >
+              <FiEdit2 size={18} />
+            </button>
+          );
+        },
       },
     ],
     []

@@ -14,13 +14,17 @@ export const ROUTES = {
     ATTENDANCE: '/attendance',
     EMPLOYEEATTENDANCEDETAILS: '/attendance/:employeeId',
     LEAVEREQUESTS: '/requests',
-    REQUESTSDETAILS:'/requests/:id',
+    REQUESTSDETAILS: '/requests/:id',
     ROLES: '/roles',
     HOLIDAYS: '/holidays',
     ADDHOLIDAY: "/holidays/add",
     EDITHOLIDAY: "/holidays/edit/:id",
     SALARY: '/salary',
+    EmployeeDocuments: "/employee-documents",
+    EmployeeDocumentDetails: "/employee-documents/:id",
     SETTINGS: '/setting',
+    AddAttendance: "/attendance/add",
+    EditAttendance: "/attendance/:attendanceId/edit",
   },
 
   HR: {
