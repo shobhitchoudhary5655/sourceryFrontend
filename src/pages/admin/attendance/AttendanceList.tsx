@@ -19,7 +19,11 @@ interface EmployeeAttendanceRow {
   checkOut: string;
   checkInRaw: string | null;
   checkOutRaw: string | null;
+  officeHours: number;
   workingHours: number;
+  totalBreakMinutes: number;
+  isOnBreak: boolean;
+  breakStartTime: string | null;
 }
 
 const formatStatus = (status?: string) => {
@@ -41,6 +45,44 @@ const formatStatus = (status?: string) => {
   return labels[status] || '-';
 };
 
+const formatHours = (hours: number) => {
+  const totalMinutes = Math.round(hours * 60);
+
+  const hrs = Math.floor(totalMinutes / 60);
+  const mins = totalMinutes % 60;
+
+  if (hrs === 0) {
+    return `${mins}m`;
+  }
+
+  return `${hrs}h ${mins}m`;
+};
+const formatBreak = (minutes: number) => {
+  const hrs = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+
+  if (hrs === 0) {
+    return `${mins}m`;
+  }
+
+  return `${hrs}h ${mins}m`;
+};
+const getBreakTime = (
+  isOnBreak: boolean,
+  breakStartTime: string | null,
+  totalBreakMinutes: number
+) => {
+
+  if (!isOnBreak) {
+    return formatBreak(totalBreakMinutes);
+  }
+
+  const seconds =
+    (Date.now() -
+      new Date(breakStartTime!).getTime()) / 1000;
+
+  return formatDuration(seconds);
+};
 const formatDuration = (totalSeconds: number) => {
   const safeSeconds = Math.max(0, Math.floor(totalSeconds));
   const hours = Math.floor(safeSeconds / 3600);
@@ -84,16 +126,31 @@ const Attendance = () => {
       const formattedEmployees = response.users.map((employee: any) => {
         const todayAttendance = employee.attendances?.[0];
 
+        const breaks = todayAttendance?.breaks || [];
+
+        const totalBreakMinutes = breaks.reduce(
+          (sum: number, item: any) => sum + (item.durationMinutes || 0),
+          0
+        );
+
+        const activeBreak = breaks.find(
+          (item: any) => !item.endTime
+        );
+
         return {
           id: employee.id,
           name: employee.name,
-          designation: employee.designation || '-',
-          status: todayAttendance?.status || '-',
+          designation: employee.designation || "-",
+          status: todayAttendance?.status || "-",
           checkIn: formatISTTime(todayAttendance?.checkIn),
           checkOut: formatISTTime(todayAttendance?.checkOut),
           checkInRaw: todayAttendance?.checkIn || null,
           checkOutRaw: todayAttendance?.checkOut || null,
+          officeHours: Number(todayAttendance?.officeHours || 0),
           workingHours: Number(todayAttendance?.workingHours || 0),
+          totalBreakMinutes,
+          isOnBreak: !!activeBreak,
+          breakStartTime: activeBreak?.startTime || null,
         };
       });
 
@@ -141,17 +198,42 @@ const Attendance = () => {
     { key: 'checkIn', title: 'Check In' },
     { key: 'checkOut', title: 'Check Out' },
     {
-      key: 'workingHours',
-      title: 'Working Hours',
-      render: (_: unknown, row: EmployeeAttendanceRow) => (
-        <span>
-          {getWorkingTime(
-            row.checkInRaw,
-            row.checkOutRaw,
-            row.workingHours
-          )}
-        </span>
-      ),
+      key: "officeHours",
+      title: "Office Hours",
+      render: (_: unknown, row: EmployeeAttendanceRow) => {
+        if (!row.checkInRaw) return "-";
+
+        if (row.checkOutRaw) {
+          return formatHours(row.officeHours);
+        }
+
+        return getWorkingTime(
+          row.checkInRaw,
+          row.checkOutRaw,
+          row.officeHours
+        );
+      },
+    },
+    {
+      key: "productiveHours",
+      title: "Productive Hours",
+      render: (_: unknown, row: EmployeeAttendanceRow) => {
+        if (!row.checkOutRaw) {
+          return "--";
+        }
+
+        return formatHours(row.workingHours);
+      },
+    },
+    {
+      key: "break",
+      title: "Break",
+      render: (_: unknown, row: EmployeeAttendanceRow) =>
+        getBreakTime(
+          row.isOnBreak,
+          row.breakStartTime,
+          row.totalBreakMinutes
+        ),
     },
     {
       key: 'action',
@@ -190,6 +272,7 @@ const Attendance = () => {
           />
 
           <button
+            onClick={() => navigate("/attendance/add")}
             className="rounded-xl bg-[#7F26FD] px-4 py-2 text-white hover:opacity-90"
           >
             Add Attendance

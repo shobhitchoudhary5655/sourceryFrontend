@@ -1,5 +1,5 @@
 import { ROUTES } from '@/routes/routes';
-import {LayoutDashboard,Users,Clock,Calendar,Shield,Settings,Currency} from 'lucide-react';
+import { LayoutDashboard, Users, Clock, Calendar, Shield, Settings, Currency, FileText } from 'lucide-react';
 
 export const sidebarMenus = {
   ADMIN: [
@@ -8,16 +8,37 @@ export const sidebarMenus = {
       path: ROUTES.ADMIN.DASHBOARD,
       icon: LayoutDashboard,
     },
+    // {
+    //   name: 'Employees',
+    //   path: ROUTES.ADMIN.EMPLOYEES,
+    //   icon: Users,
+    // },
     {
-      name: 'Employees',
-      path: ROUTES.ADMIN.EMPLOYEES,
+      name: "Employees",
       icon: Users,
+      children: [
+        {
+          name: "Employee List",
+          path: ROUTES.ADMIN.EMPLOYEES,
+          icon: Users,
+        },
+        {
+          name: "Attendance",
+          path: ROUTES.ADMIN.ATTENDANCE,
+          icon: Clock,
+        },
+        {
+          name: "Documents",
+          path: ROUTES.ADMIN.EmployeeDocuments,
+          icon: FileText,
+        },
+      ],
     },
-    {
-      name: 'Attendance',
-      path: ROUTES.ADMIN.ATTENDANCE,
-      icon: Clock,
-    },
+    // {
+    //   name: 'Attendance',
+    //   path: ROUTES.ADMIN.ATTENDANCE,
+    //   icon: Clock,
+    // },
     {
       name: 'Requests',
       path: ROUTES.ADMIN.LEAVEREQUESTS,
@@ -33,6 +54,11 @@ export const sidebarMenus = {
       path: ROUTES.ADMIN.SALARY,
       icon: Currency,
     },
+    // {
+    //   name: 'Employee Documents',
+    //   path: ROUTES.ADMIN.EmployeeDocuments,
+    //   icon: FileText,
+    // },
     {
       name: 'Settings',
       path: ROUTES.ADMIN.SETTINGS,

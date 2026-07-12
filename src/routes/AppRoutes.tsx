@@ -21,6 +21,10 @@ import EditEmployee from '@/pages/admin/employees/EditEmployee';
 import EmployeeDetails from '@/pages/admin/employees/EmployeeDetails';
 import Settings from '@/pages/admin/settings/Settings';
 import Salary from '@/pages/admin/salary/Salary';
+import EmployeeDocuments from '@/pages/admin/employeeDocuments/EmployeeDocuments';
+import EmployeeDocumentDetails from '@/pages/admin/employeeDocuments/EmployeeDocumentDetails';
+import AddAttendance from '@/pages/admin/attendance/AddAttendance';
+import EditAttendance from '@/pages/admin/attendance/EditAttendance';
 
 const AppRoutes = () => {
     return (
@@ -45,12 +49,16 @@ const AppRoutes = () => {
                         <Route path={ROUTES.ADMIN.LEAVEREQUESTS} element={<LeaveRequests />} />
                         <Route path={ROUTES.ADMIN.HOLIDAYS} element={<Holidays />} />
                         <Route path={ROUTES.ADMIN.ADDHOLIDAY} element={<AddHoliday />} />
-                        <Route path={ROUTES.ADMIN.EDITEMPLOYEE} element={<EditHoliday />} />
+                        <Route path={ROUTES.ADMIN.EDITHOLIDAY} element={<EditHoliday />} />
                         <Route path={ROUTES.ADMIN.EMPLOYEEATTENDANCEDETAILS} element={<EmployeeAttendanceDetails />} />
                         <Route path={ROUTES.PROFILE} element={<Profile />} />
                         <Route path={ROUTES.ADMIN.SETTINGS} element={<Settings />} />
                         <Route path={ROUTES.ADMIN.REQUESTSDETAILS} element={<LeaveDetails />} />
                         <Route path={ROUTES.ADMIN.SALARY} element={<Salary />} />
+                        <Route path={ROUTES.ADMIN.EmployeeDocuments} element={<EmployeeDocuments />} />
+                        <Route path={ROUTES.ADMIN.EmployeeDocumentDetails} element={<EmployeeDocumentDetails />} />
+                        <Route path={ROUTES.ADMIN.AddAttendance} element={<AddAttendance />} />
+                        <Route path={ROUTES.ADMIN.EditAttendance} element={<EditAttendance />} />
                     </Route>
                 </Route>
 
