@@ -2,6 +2,8 @@ import { LogOut, User, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import notificationService from '@/services/notification.service';
+import { removeFCMToken } from '@/services/notification.service.api';
 
 const ProfileDropdown = () => {
   const navigate = useNavigate();
@@ -31,8 +33,22 @@ const ProfileDropdown = () => {
     navigate('/profile');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setOpen(false);
+
+    try {
+
+      const token = await notificationService.getFCMToken();
+
+      if (token) {
+        await removeFCMToken(token);
+        localStorage.removeItem("fcmToken");
+      }
+
+    } catch (err) {
+      console.log(err);
+    }
+
     logout();
   };
 

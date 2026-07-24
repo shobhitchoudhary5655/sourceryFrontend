@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "generate-sw": "node scripts/generate-sw.mjs",
+    "build": "npm run generate-sw && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -18,6 +19,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",
     "dayjs": "^1.11.21",
+    "firebase": "^12.16.0",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^1.18.0",
     "react": "^19.2.6",
@@ -37,6 +39,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "dotenv": "^17.4.2",
     "eslint": "^10.3.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
