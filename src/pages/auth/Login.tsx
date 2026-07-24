@@ -5,6 +5,7 @@ import { ROUTES } from '@/routes/routes';
 import logo from '@/assets/logo/logo.png';
 import { useAuth } from '@/context/AuthContext';
 import { loginUser } from '@/services/auth.service';
+import notificationService from '@/services/notification.service';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -22,13 +23,28 @@ const Login = () => {
 
         try {
             setLoading(true);
-            const response = await loginUser({ email, password, });
-            if(response.user.role !='admin'){
+
+            const granted = await notificationService.requestPermission();
+            console.log("Permission:", granted);
+
+            let fcmToken = "";
+
+            if (granted) {
+                fcmToken = await notificationService.getFCMToken();
+            }
+            const response = await loginUser({
+                email,
+                password,
+                fcmToken,
+            });
+
+            if (response.user.role != 'admin') {
                 return null
             }
-            login( response.token,response.user,);
+            login(response.token, response.user);
+
+
             navigate(ROUTES.ADMIN.DASHBOARD);
-            console.log({ email, password, });
         } catch (error) {
             console.log(error);
         } finally {
