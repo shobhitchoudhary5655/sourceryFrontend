@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import PageHeader from "@/components/common/Header/PageHeader";
 import Breadcrumb from "@/components/common/Breadcrumb/Breadcrumb";
 import { getAttendanceById, updateAttendance } from "@/services/admin.service";
+import { formatTimeForInput } from "@/utils/dateTime";
 
 const EditAttendance = () => {
     const { attendanceId } = useParams();
@@ -49,8 +50,8 @@ const EditAttendance = () => {
 
             setForm({
                 status: attendance.status,
-                checkIn: attendance.checkIn?.slice(11, 16) || "",
-                checkOut: attendance.checkOut?.slice(11, 16) || "",
+                checkIn: formatTimeForInput(attendance.checkIn),
+                checkOut: formatTimeForInput(attendance.checkOut),
                 location: attendance.location || "",
                 notes: attendance.notes || "",
                 inOffice: attendance.inOffice,
