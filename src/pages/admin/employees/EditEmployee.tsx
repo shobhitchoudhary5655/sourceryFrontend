@@ -213,7 +213,7 @@ const EditEmployee = () => {
     if (Number(form.clBalance) < 0) {
       newErrors.clBalance = "CL Balance cannot be negative.";
     }
-    
+
     if (Number(form.slBalance) < 0) {
       newErrors.slBalance = "SL Balance cannot be negative.";
     }
@@ -239,6 +239,11 @@ const EditEmployee = () => {
         clBalance: form.clBalance ? Number(form.clBalance) : 0,
         slBalance: form.slBalance ? Number(form.slBalance) : 0,
       };
+      
+      if (form.password.trim()) {
+        payload.password = form.password;
+      }
+
 
       await updateEmployee(Number(id), payload);
       setToast({
