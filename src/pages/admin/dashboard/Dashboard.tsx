@@ -1,22 +1,22 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Users, UserCheck, UserX, Calendar, ClipboardList, } from 'lucide-react';
+import { Users, UserCheck, UserX, Calendar, ClipboardList, UserMinus, } from 'lucide-react';
 import PageHeader from '@/components/common/Header/PageHeader';
 import StatCard from '@/components/common/StatCard/StatCard';
 import Breadcrumb from '@/components/common/Breadcrumb/Breadcrumb';
 import DataTable from '@/components/ui/Table/DataTable';
 import AttendanceChart, { type AttendanceChartItem, } from './widgets/AttendanceChart';
-import LeaveChart, { type LeaveChartItem, } from './widgets/LeaveChart';
+import LeaveChart, { type LeaveChartItem } from './widgets/LeaveChart';
 import { getDashboardDetails, type DashboardData, } from '@/services/admin.service';
 import PageLoader from '@/components/common/Loader/PageLoader';
 
 const DEFAULT_ATTENDANCE_DATA: AttendanceChartItem[] = [
-  { day: 'Mon', present: 0 },
-  { day: 'Tue', present: 0 },
-  { day: 'Wed', present: 0 },
-  { day: 'Thu', present: 0 },
-  { day: 'Fri', present: 0 },
-  { day: 'Sat', present: 0 },
-  { day: 'Sun', present: 0 },
+  { day: 'Mon', present: 0, absent: 0, leave: 0 },
+  { day: 'Tue', present: 0, absent: 0, leave: 0 },
+  { day: 'Wed', present: 0, absent: 0, leave: 0 },
+  { day: 'Thu', present: 0, absent: 0, leave: 0 },
+  { day: 'Fri', present: 0, absent: 0, leave: 0 },
+  { day: 'Sat', present: 0, absent: 0, leave: 0 },
+  { day: 'Sun', present: 0, absent: 0, leave: 0 },
 ];
 
 const Dashboard = () => {
@@ -63,23 +63,45 @@ const Dashboard = () => {
       value: dashboardData?.stats?.absentToday ?? 0,
       icon: <UserX />,
     },
+    // {
+    //   title: 'Upcoming Holidays',
+    //   value: dashboardData?.upcomingHolidays?.length ?? 0,
+    //   icon: <Calendar />,
+    // },
     {
-      title: 'Upcoming Holidays',
-      value: dashboardData?.upcomingHolidays?.length ?? 0,
-      icon: <Calendar />,
+      title: 'Leave Today',
+      value: dashboardData?.stats?.leaveToday ?? 0,
+      icon: <UserMinus />,
     },
   ];
 
-  const attendanceData: AttendanceChartItem[] = DEFAULT_ATTENDANCE_DATA;
+  const attendanceData =
+    dashboardData?.weeklyAttendance ?? DEFAULT_ATTENDANCE_DATA;
 
   const leaveData: LeaveChartItem[] = [
     {
-      name: 'Pending',
-      value: dashboardData?.pendingRequest?.leaveRequest ?? 0,
+      name: 'Approved Leave',
+      value: dashboardData?.requestSummary?.approvedLeave ?? 0,
     },
     {
-      name: 'WFH Pending',
-      value: dashboardData?.pendingRequest?.wfhReqests ?? 0,
+      name: 'Pending Leave',
+      value: dashboardData?.requestSummary?.pendingLeave ?? 0,
+    },
+    {
+      name: 'Rejected Leave',
+      value: dashboardData?.requestSummary?.rejectedLeave ?? 0,
+    },
+    {
+      name: 'Approved WFH',
+      value: dashboardData?.requestSummary?.approvedWFH ?? 0,
+    },
+    {
+      name: 'Pending WFH',
+      value: dashboardData?.requestSummary?.pendingWFH ?? 0,
+    },
+    {
+      name: 'Rejected WFH',
+      value: dashboardData?.requestSummary?.rejectedWFH ?? 0,
     },
   ];
 
@@ -89,8 +111,8 @@ const Dashboard = () => {
   ];
 
   if (loading) {
-  return <PageLoader text="Loading dashboard details..." />;
-}
+    return <PageLoader text="Loading dashboard details..." />;
+  }
 
   if (error) {
     return (
@@ -195,7 +217,7 @@ const Dashboard = () => {
             </span>
 
             <span className="text-xl font-bold text-[#7F26FD] sm:text-2xl">
-              {dashboardData?.pendingRequest?.wfhReqests ?? 0}
+              {dashboardData?.pendingRequest?.wfhRequests ?? 0}
             </span>
           </div>
         </div>

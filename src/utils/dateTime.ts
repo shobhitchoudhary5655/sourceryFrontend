@@ -39,3 +39,16 @@ export const getMonthName = (month: number) => {
         month: "long",
     });
 };
+
+export const formatTimeForInput = (date?: string | null) => {
+    if (!date) return "";
+
+    const d = new Date(date);
+
+    return new Intl.DateTimeFormat("en-IN", {
+        timeZone: "Asia/Kolkata",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+    }).format(d);
+};

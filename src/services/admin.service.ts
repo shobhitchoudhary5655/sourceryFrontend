@@ -10,6 +10,7 @@ export interface DashboardStats {
   totalEmployees: number;
   presentToday: number;
   absentToday: number;
+  leaveToday: number;
 }
 
 export interface PendingRequest {
@@ -18,10 +19,42 @@ export interface PendingRequest {
 }
 
 export interface DashboardData {
-  success?: boolean;
-  stats: DashboardStats;
-  upcomingHolidays: Holiday[];
-  pendingRequest: PendingRequest;
+  success: boolean;
+
+  stats: {
+    totalEmployees: number;
+    presentToday: number;
+    absentToday: number;
+    leaveToday: number;
+  };
+
+  pendingRequest: {
+    leaveRequest: number;
+    wfhRequests: number;
+  };
+
+  weeklyAttendance: {
+    day: string;
+    present: number;
+    absent: number;
+    leave: number;
+  }[];
+
+  requestSummary: {
+    approvedLeave: number;
+    pendingLeave: number;
+    rejectedLeave: number;
+
+    approvedWFH: number;
+    pendingWFH: number;
+    rejectedWFH: number;
+  };
+
+  upcomingHolidays: {
+    id: number;
+    holidayName: string;
+    date: string;
+  }[];
 }
 
 export const getDashboardDetails = async (): Promise<DashboardData> => {
@@ -221,9 +254,9 @@ export const getAttendanceById = async (id: number) => {
 };
 
 export const getDocumentViewUrl = async (id: number) => {
-    const response = await api.get(
-        `/upload/documents/${id}/view`
-    );
+  const response = await api.get(
+    `/upload/documents/${id}/view`
+  );
 
-    return response.data;
+  return response.data;
 };
