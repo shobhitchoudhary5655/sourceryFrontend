@@ -63,55 +63,97 @@ const EmployeeDetails = () => {
       </div>
 
       <div className="rounded-xl border bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6 lg:p-8">
-        <div className="flex flex-col gap-4 border-b pb-5 xs:flex-row xs:items-center sm:gap-5">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#7F26FD] text-xl font-bold text-white">
-            {data.name?.charAt(0)?.toUpperCase() || 'E'}
+
+        {/* Center Profile Image */}
+        <div className="flex flex-col items-center border-b pb-6">
+
+          <div className="h-48 w-48 overflow-hidden rounded-full border-4 border-[#7F26FD] bg-[#7F26FD] shadow-lg">
+
+            {data.profilePicture ? (
+
+              <img
+                src={data.profilePicture}
+                alt={data.name}
+                className="h-full w-full object-cover"
+              />
+
+            ) : (
+
+              <div className="flex h-full w-full items-center justify-center text-6xl font-bold text-white">
+                {data.name?.charAt(0)?.toUpperCase() || 'E'}
+              </div>
+
+            )}
+
           </div>
 
-          <div className="min-w-0">
-            <h2 className="break-words text-lg font-semibold text-gray-800 sm:text-xl">
-              {data.name || '-'}
-            </h2>
 
-            <p className="break-words text-sm text-gray-500 sm:text-base">
-              {data.designation || '-'}
-            </p>
+          <h2 className="mt-5 text-2xl font-semibold text-gray-800">
+            {data.name || '-'}
+          </h2>
 
-            <p className="break-all text-sm text-gray-400">
-              {data.email || '-'}
-            </p>
-          </div>
+          {/* <p className="mt-1 text-gray-500">
+            {data.designation || '-'}
+          </p>
+
+          <p className="mt-1 text-sm text-gray-400">
+            {data.email || '-'}
+          </p> */}
+
         </div>
 
-        <div className="mt-5 grid grid-cols-1 gap-5 sm:mt-6 sm:gap-6 md:grid-cols-2">
-          <div className="min-w-0 space-y-1.5">
-            <p className="text-sm text-gray-500">Phone</p>
-            <p className="break-words font-medium text-gray-800">
+
+
+        {/* Employee Details */}
+        <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
+
+
+          <div>
+            <p className="text-sm text-gray-500">
+              Phone
+            </p>
+
+            <p className="font-medium text-gray-800">
               {data.phone || '-'}
             </p>
           </div>
 
-          <div className="min-w-0 space-y-1.5">
-            <p className="text-sm text-gray-500">Role</p>
-            <p className="break-words font-medium text-gray-800">
+
+          <div>
+            <p className="text-sm text-gray-500">
+              Role
+            </p>
+
+            <p className="font-medium text-gray-800">
               {data.role?.name || '-'}
             </p>
           </div>
 
-          <div className="min-w-0 space-y-1.5">
-            <p className="text-sm text-gray-500">Designation</p>
-            <p className="break-words font-medium text-gray-800">
+
+          <div>
+            <p className="text-sm text-gray-500">
+              Designation
+            </p>
+
+            <p className="font-medium text-gray-800">
               {data.designation || '-'}
             </p>
           </div>
 
-          <div className="min-w-0 space-y-1.5">
-            <p className="text-sm text-gray-500">Email</p>
+
+          <div>
+            <p className="text-sm text-gray-500">
+              Email
+            </p>
+
             <p className="break-all font-medium text-gray-800">
               {data.email || '-'}
             </p>
           </div>
+
+
         </div>
+
       </div>
     </div>
   );
