@@ -18,7 +18,9 @@ interface AttendanceRecord {
   officeHours: number;
   workingHours: number;
   location: string | null;
+  checkOutLocation: string | null;
   inOffice: boolean | null;
+  checkOutInOffice: boolean | null;
   breaks: {
     id: number;
     startTime: string;
@@ -46,8 +48,10 @@ interface MonthlyAttendanceRow {
   checkOut: string;
   officeHours: number;
   workingHours: number;
-  location: string;
+  checkInLocation: string;
+  checkOutLocation: string;
   inOffice: boolean | null;
+  checkOutInOffice: boolean | null;
   breakMinutes: number;
 }
 
@@ -105,8 +109,10 @@ const getMonthAttendanceRows = (
         checkOut: formatISTTime(attendanceItem.checkOut),
         officeHours: attendanceItem.officeHours || 0,
         workingHours: attendanceItem.workingHours || 0,
-        location: attendanceItem.location || "-",
+        checkInLocation: attendanceItem.location || "-",
+        checkOutLocation: attendanceItem.checkOutLocation || "-",
         inOffice: attendanceItem.inOffice,
+        checkOutInOffice: attendanceItem.checkOutInOffice,
         breakMinutes,
       };
     }
@@ -121,8 +127,10 @@ const getMonthAttendanceRows = (
         officeHours: 0,
         workingHours: 0,
         breakMinutes: 0,
-        location: "-",
+        checkInLocation: "-",
+        checkOutLocation: "-",
         inOffice: null,
+        checkOutInOffice: null,
       };
     }
 
@@ -136,8 +144,10 @@ const getMonthAttendanceRows = (
         officeHours: 0,
         workingHours: 0,
         breakMinutes: 0,
-        location: "-",
+        checkInLocation: "-",
+        checkOutLocation: "-",
         inOffice: null,
+        checkOutInOffice: null,
       };
     }
 
@@ -150,8 +160,10 @@ const getMonthAttendanceRows = (
       officeHours: 0,
       workingHours: 0,
       breakMinutes: 0,
-      location: "-",
+      checkInLocation: "-",
+      checkOutLocation: "-",
       inOffice: null,
+      checkOutInOffice: null,
     };
   });
 };
@@ -308,14 +320,32 @@ const EmployeeAttendanceDetails = () => {
           formatBreak(value),
       },
       {
-        key: "location" as keyof MonthlyAttendanceRow,
-        title: "Location",
-        render: (value: unknown): React.ReactNode =>
-          value ? String(value) : "-",
+        key: "checkInLocation",
+        title: "Punch In Location",
+        render: (value: unknown) => (
+          <div
+            className="max-w-[150px] truncate"
+            title={String(value || "-")}
+          >
+            {String(value || "-")}
+          </div>
+        ),
+      },
+      {
+        key: "checkOutLocation",
+        title: "Punch Out Location",
+        render: (value: unknown) => (
+          <div
+            className="max-w-[150px] truncate"
+            title={String(value || "-")}
+          >
+            {String(value || "-")}
+          </div>
+        ),
       },
       {
         key: "inOffice",
-        title: "In Office",
+        title: "CheckIn in Office",
         render: (value: unknown) => {
           if (value === null) return "-";
 
@@ -330,6 +360,23 @@ const EmployeeAttendanceDetails = () => {
           );
         },
       },
+      // {
+      //   key: "checkOutInOffice",
+      //   title: "CheckOut in Office",
+      //   render: (value: unknown) => {
+      //     if (value === null) return "-";
+
+      //     return value ? (
+      //       <span className="text-green-600 font-semibold">
+      //         Yes
+      //       </span>
+      //     ) : (
+      //       <span className="text-red-600 font-semibold">
+      //         No
+      //       </span>
+      //     );
+      //   },
+      // },
       {
         key: "action",
         title: "Action",
