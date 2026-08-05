@@ -19,4 +19,5 @@ export interface DataTableProps<T> {
   onPageChange?: (
     page: number
   ) => void;
+  rowClassName?: (row: T, index: number) => string;
 }
