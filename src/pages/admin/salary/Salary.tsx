@@ -11,6 +11,7 @@ import { getSalaryList, markSalaryPaid, createSalary } from '@/services/salary.s
 import Toast from '@/components/ui/Toast/Toast';
 import { formatISTDate, getMonthName } from "@/utils/dateTime";
 import type { Salary as SalaryType } from "@/services/salary.service";
+import { getSalaryBadgeColor, getSalaryRowColor } from "@/utils/monthColors";
 
 const Salary = () => {
     const [search, setSearch] = useState('');
@@ -90,9 +91,19 @@ const Salary = () => {
             },
 
             {
-                key: 'month',
-                title: 'Month',
-                render: (value: unknown) => getMonthName(Number(value)),
+                key: "month",
+                title: "Month",
+                render: (value: unknown) => {
+                    const month = Number(value);
+
+                    return (
+    <span
+        className={`rounded-full px-3 py-1 text-xs font-semibold ${getSalaryBadgeColor(month)}`}
+    >
+        {getMonthName(month)}
+    </span>
+);
+                },
             },
 
             {
@@ -307,6 +318,7 @@ const Salary = () => {
                         currentPage={page}
                         totalPages={totalPages}
                         onPageChange={setPage}
+                        rowClassName={(row) => getSalaryRowColor(row.month)}
                     />
                 </div>
             </div>

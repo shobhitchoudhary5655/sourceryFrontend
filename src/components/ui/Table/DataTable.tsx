@@ -9,6 +9,7 @@ function DataTable<T>({
   currentPage = 1,
   totalPages = 1,
   onPageChange,
+  rowClassName,
 }: DataTableProps<T>) {
   return (
     <div
@@ -71,10 +72,11 @@ function DataTable<T>({
                         border-gray-100
                         transition-colors
                         hover:bg-purple-50
-                        ${
-                          rowIndex % 2 === 0
-                            ? 'bg-white'
-                            : 'bg-gray-50'
+                        ${rowClassName
+                          ? rowClassName(row, rowIndex)
+                          : rowIndex % 2 === 0
+                            ? "bg-white"
+                            : "bg-gray-50"
                         }
                       `}
                     >
@@ -91,23 +93,23 @@ function DataTable<T>({
                         >
                           {column.render
                             ? column.render(
-                                (
-                                  row as Record<
-                                    string,
-                                    unknown
-                                  >
-                                )[String(column.key)],
-                                row,
-                                rowIndex
-                              )
+                              (
+                                row as Record<
+                                  string,
+                                  unknown
+                                >
+                              )[String(column.key)],
+                              row,
+                              rowIndex
+                            )
                             : String(
-                                (
-                                  row as Record<
-                                    string,
-                                    unknown
-                                  >
-                                )[String(column.key)] ?? ''
-                              )}
+                              (
+                                row as Record<
+                                  string,
+                                  unknown
+                                >
+                              )[String(column.key)] ?? ''
+                            )}
                         </td>
                       ))}
                     </tr>
