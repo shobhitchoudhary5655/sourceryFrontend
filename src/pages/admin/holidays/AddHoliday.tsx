@@ -1,15 +1,33 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '@/components/common/Header/PageHeader';
-import { addHoliday } from '@/services/admin.service';
+import { addHoliday, getEmployees } from '@/services/admin.service';
 import PageLoader from '@/components/common/Loader/PageLoader';
 
 const AddHoliday = () => {
   const navigate = useNavigate();
   const [holidayName, setHolidayName] = useState('');
   const [date, setDate] = useState('');
+  const [holidayType, setHolidayType] = useState<"PUBLIC" | "SPECIAL_HOLIDAY" | "SPECIAL_WFH">("PUBLIC");
+  const [description, setDescription] = useState("");
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [selectedEmployees, setSelectedEmployees] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
-  const isValid = Boolean(holidayName.trim() && date);
+  const isValid = holidayName.trim() && date && (holidayType === "PUBLIC" || selectedEmployees.length > 0);
+
+  useEffect(() => {
+    loadEmployees();
+  }, []);
+
+  const loadEmployees = async () => {
+    try {
+      const res = await getEmployees();
+
+      setEmployees(res.users || []);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!isValid || loading) return;
@@ -19,6 +37,9 @@ const AddHoliday = () => {
       await addHoliday({
         holidayName: holidayName.trim(),
         date,
+        holidayType,
+        description,
+        employeeIds: selectedEmployees,
       });
       navigate('/holidays');
     } catch (err) {
@@ -75,6 +96,121 @@ const AddHoliday = () => {
               className={inputClass}
             />
           </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-600">
+              Holiday Type
+            </label>
+
+            <select
+              value={holidayType}
+              onChange={(e) =>
+                setHolidayType(
+                  e.target.value as
+                  | "PUBLIC"
+                  | "SPECIAL_HOLIDAY"
+                  | "SPECIAL_WFH"
+                )
+              }
+              className={inputClass}
+            >
+              <option value="PUBLIC">
+                Public Holiday
+              </option>
+
+              <option value="SPECIAL_HOLIDAY">
+                Special Holiday
+              </option>
+
+              <option value="SPECIAL_WFH">
+                Special Work From Home
+              </option>
+            </select>
+          </div>
+
+          <div className="md:col-span-2">
+
+            <label className="text-sm font-medium text-gray-600">
+              Description
+            </label>
+
+            <textarea
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className={inputClass}
+            />
+
+          </div>
+
+          {
+            holidayType !== "PUBLIC" && (
+
+              <div className="md:col-span-2">
+
+                <label className="text-sm font-medium">
+
+                  Employees
+
+                </label>
+
+                <div className="mt-3 max-h-64 overflow-auto border rounded-lg">
+
+                  {
+                    employees.map((item: any) => {
+
+                      const checked =
+                        selectedEmployees.includes(item.id);
+
+                      return (
+
+                        <label
+                          key={item.id}
+                          className="flex items-center gap-3 p-3 border-b"
+                        >
+
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(e) => {
+
+                              if (e.target.checked) {
+
+                                setSelectedEmployees(prev => [
+                                  ...prev,
+                                  item.id,
+                                ]);
+
+                              } else {
+
+                                setSelectedEmployees(prev =>
+                                  prev.filter(id => id !== item.id)
+                                );
+
+                              }
+
+                            }}
+                          />
+
+                          <span>
+
+                            {item.name}
+
+                          </span>
+
+                        </label>
+
+                      );
+
+                    })
+                  }
+
+                </div>
+
+              </div>
+
+            )
+          }
         </div>
 
         <div className="flex flex-col-reverse gap-3 border-t pt-5 sm:flex-row sm:justify-end">
