@@ -13,8 +13,27 @@ type Holiday = {
   id: number;
   name: string;
   date: string;
+  holidayType: HolidayType;
+  description?: string;
+  employeeCount: number;
 };
 
+const HOLIDAY_TYPE: Record<HolidayType, string> = {
+  PUBLIC: "Public Holiday",
+  SPECIAL_HOLIDAY: "Special Holiday",
+  SPECIAL_WFH: "Special WFH",
+};
+
+type HolidayType =
+  | "PUBLIC"
+  | "SPECIAL_HOLIDAY"
+  | "SPECIAL_WFH";
+
+const colors: Record<HolidayType, string> = {
+  PUBLIC: "bg-green-100 text-green-700",
+  SPECIAL_HOLIDAY: "bg-blue-100 text-blue-700",
+  SPECIAL_WFH: "bg-yellow-100 text-yellow-700",
+};
 const Holidays = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
@@ -35,6 +54,9 @@ const Holidays = () => {
         id: item.id,
         name: item.holidayName,
         date: item.date,
+        holidayType: item.holidayType,
+        description: item.description,
+        employeeCount: item.employees?.length || 0,
       }));
 
       setData(mapped);
@@ -74,7 +96,7 @@ const Holidays = () => {
 
   const columns = useMemo(
     () => [
-       {
+      {
         key: "sno",
         title: "S No.",
         render: (_value: unknown, _row: Holiday, index: number) => (page - 1) * pageSize + index + 1,
@@ -96,6 +118,29 @@ const Holidays = () => {
             {(value as string) || '-'}
           </span>
         ),
+      },
+      {
+        key: "holidayType",
+        title: "Type",
+        render: (_: unknown, row: Holiday) => (
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${colors[row.holidayType]
+              }`}
+          >
+            {HOLIDAY_TYPE[row.holidayType]}
+          </span>
+        )
+      },
+      {
+        key: "employeeCount",
+        title: "Employees",
+        render: (value: any) => {
+
+          return value === 0
+            ? "All"
+            : value;
+
+        }
       },
       {
         key: 'action',
