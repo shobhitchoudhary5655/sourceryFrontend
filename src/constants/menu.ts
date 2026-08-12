@@ -45,7 +45,7 @@ export const sidebarMenus = {
       icon: Shield,
     },
     {
-      name: 'Holidays',
+      name: 'Holidays/WFH',
       path: ROUTES.ADMIN.HOLIDAYS,
       icon: Shield,
     },

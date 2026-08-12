@@ -216,7 +216,7 @@ const Holidays = () => {
             sm:w-auto
           "
         >
-          + Add Holiday
+          + Add Holiday/WFH
         </button>
       </div>
 
