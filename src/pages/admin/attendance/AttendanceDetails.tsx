@@ -17,6 +17,7 @@ interface AttendanceRecord {
   status: string;
   officeHours: number;
   workingHours: number;
+  effectiveHours: number;
   location: string | null;
   checkOutLocation: string | null;
   inOffice: boolean | null;
@@ -48,6 +49,7 @@ interface MonthlyAttendanceRow {
   checkOut: string;
   officeHours: number;
   workingHours: number;
+  effectiveHours: number;
   checkInLocation: string;
   checkOutLocation: string;
   inOffice: boolean | null;
@@ -109,6 +111,7 @@ const getMonthAttendanceRows = (
         checkOut: formatISTTime(attendanceItem.checkOut),
         officeHours: attendanceItem.officeHours || 0,
         workingHours: attendanceItem.workingHours || 0,
+        effectiveHours: attendanceItem.effectiveHours || 0,
         checkInLocation: attendanceItem.location || "-",
         checkOutLocation: attendanceItem.checkOutLocation || "-",
         inOffice: attendanceItem.inOffice,
@@ -126,6 +129,7 @@ const getMonthAttendanceRows = (
         checkOut: '-',
         officeHours: 0,
         workingHours: 0,
+        effectiveHours:0,
         breakMinutes: 0,
         checkInLocation: "-",
         checkOutLocation: "-",
@@ -143,6 +147,7 @@ const getMonthAttendanceRows = (
         checkOut: '-',
         officeHours: 0,
         workingHours: 0,
+        effectiveHours: 0,
         breakMinutes: 0,
         checkInLocation: "-",
         checkOutLocation: "-",
@@ -159,6 +164,7 @@ const getMonthAttendanceRows = (
       checkOut: '-',
       officeHours: 0,
       workingHours: 0,
+      effectiveHours: 0,
       breakMinutes: 0,
       checkInLocation: "-",
       checkOutLocation: "-",
@@ -310,6 +316,12 @@ const EmployeeAttendanceDetails = () => {
       {
         key: "workingHours",
         title: "Productive Hours",
+        render: (value: any) =>
+          formatHours(value),
+      },
+      {
+        key: "effectiveHours",
+        title: "Effective Hours",
         render: (value: any) =>
           formatHours(value),
       },
