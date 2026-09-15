@@ -18,6 +18,7 @@ const AddAttendance = () => {
         checkOut: "",
         location: "",
         notes: "",
+        inOffice: true,
     });
 
     const fetchEmployees = async () => {
@@ -72,7 +73,7 @@ const AddAttendance = () => {
                 checkOut: form.checkOut || undefined,
                 location: form.location || undefined,
                 notes: form.notes || undefined,
-                inOffice: ["present", "halfday"].includes(form.status) ? 1 : 0,
+                inOffice: form.inOffice,
             };
 
             const response = await createAttendance(payload);
@@ -157,12 +158,14 @@ const AddAttendance = () => {
                         <select
                             className="w-full rounded-lg border p-3"
                             value={form.status}
-                            onChange={(e) =>
+                            onChange={(e) => {
+                                const status = e.target.value;
                                 setForm({
                                     ...form,
-                                    status: e.target.value,
-                                })
-                            }
+                                    status,
+                                    inOffice: status !== "work-from-home",
+                                });
+                            }}
                         >
                             <option value="">Select Status</option>
                             <option value="present">Present</option>
@@ -240,6 +243,23 @@ const AddAttendance = () => {
                             }
                         />
                     </div>
+
+                    {["present", "halfday", "work-from-home"].includes(form.status) && (
+                        <div className="md:col-span-2 flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                checked={form.inOffice}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        inOffice: e.target.checked,
+                                    })
+                                }
+                            />
+
+                            <label>In Office</label>
+                        </div>
+                    )}
 
                 </div>
 

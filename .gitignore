@@ -48,3 +48,5 @@ temp/
 # Optional
 *.swp
 *.swo
+
+public/firebase-messaging-sw.js

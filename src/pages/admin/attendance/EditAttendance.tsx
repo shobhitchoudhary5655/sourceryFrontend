@@ -17,7 +17,7 @@ const EditAttendance = () => {
         checkOut: "",
         location: "",
         notes: "",
-        inOffice: 1,
+        inOffice: false,
     });
 
     const disableTime = [
@@ -68,7 +68,6 @@ const EditAttendance = () => {
 
             const payload = {
                 ...form,
-                inOffice: ["present", "halfday"].includes(form.status) ? 1 : 0,
             };
 
             await updateAttendance(Number(attendanceId), payload);
@@ -110,7 +109,7 @@ const EditAttendance = () => {
                             status,
                             checkIn: disableStatuses.includes(status) ? "" : form.checkIn,
                             checkOut: disableStatuses.includes(status) ? "" : form.checkOut,
-                            inOffice: ["present", "halfday"].includes(status) ? 1 : 0,
+                            inOffice: ["present", "halfday"].includes(status),
                         });
                     }}
                 >
@@ -185,7 +184,7 @@ const EditAttendance = () => {
                         }
                     />
                 </div>
-                {/* {!disableTime && (
+                {!disableTime && (
                     <div className="mt-4 flex items-center gap-2">
                         <input
                             type="checkbox"
@@ -200,7 +199,7 @@ const EditAttendance = () => {
 
                         <label>In Office</label>
                     </div>
-                )} */}
+                )}
 
                 <div className="mt-6 flex gap-3">
 
