@@ -25,6 +25,8 @@ import EmployeeDocuments from '@/pages/admin/employeeDocuments/EmployeeDocuments
 import EmployeeDocumentDetails from '@/pages/admin/employeeDocuments/EmployeeDocumentDetails';
 import AddAttendance from '@/pages/admin/attendance/AddAttendance';
 import EditAttendance from '@/pages/admin/attendance/EditAttendance';
+import ResetPassword from '@/pages/auth/ResetPassword';
+import ForgotPassword from '@/pages/auth/ForgotPassword';
 
 const AppRoutes = () => {
     return (
@@ -35,6 +37,8 @@ const AppRoutes = () => {
                 {/* Public Routes */}
                 <Route element={<PublicRoute />}   >
                     <Route path={ROUTES.LOGIN} element={<Login />} />
+                    <Route  path={ROUTES.FORGOT_PASSWORD}  element={<ForgotPassword />} />
+                    <Route path={ROUTES.RESETPASSWORD} element={<ResetPassword />} />
                 </Route>
 
                 {/* Dashboard */}
