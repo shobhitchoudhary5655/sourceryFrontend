@@ -2,6 +2,8 @@ import { ROLES } from '@/utils/permissions';
 
 export const ROUTES = {
   LOGIN: '/login',
+  FORGOT_PASSWORD: "/forgot-password",
+  RESETPASSWORD: '/reset-password',
   UNAUTHORIZED: '/unauthorized',
   PROFILE: '/profile',
 
