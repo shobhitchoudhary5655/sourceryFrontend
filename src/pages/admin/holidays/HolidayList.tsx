@@ -8,6 +8,7 @@ import TableSearch from '@/components/ui/Table/TableSearch';
 import ConfirmModal from '@/components/ui/Modal/ConfirmModal';
 import { getHolidays, deleteHoliday, } from '@/services/admin.service';
 import PageLoader from '@/components/common/Loader/PageLoader';
+import { getSalaryRowColor } from "@/utils/monthColors";
 
 type Holiday = {
   id: number;
@@ -16,6 +17,7 @@ type Holiday = {
   holidayType: HolidayType;
   description?: string;
   employeeCount: number;
+  month: number;
 };
 
 const HOLIDAY_TYPE: Record<HolidayType, string> = {
@@ -57,6 +59,7 @@ const Holidays = () => {
         holidayType: item.holidayType,
         description: item.description,
         employeeCount: item.employees?.length || 0,
+        month: new Date(item.date).getMonth() + 1,
       }));
 
       setData(mapped);
@@ -229,6 +232,7 @@ const Holidays = () => {
             currentPage={page}
             totalPages={totalPages}
             onPageChange={setPage}
+            rowClassName={(row) => getSalaryRowColor(row.month)}
           />
         </div>
       </div>
