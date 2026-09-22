@@ -8,6 +8,8 @@ import TableSearch from '@/components/ui/Table/TableSearch';
 import StatusBadge from '@/components/ui/StatusBadge/StatusBadge';
 import { getLeaveRequests } from '@/services/admin.service';
 import PageLoader from '@/components/common/Loader/PageLoader';
+import { getSalaryBadgeColor, getSalaryRowColor } from "@/utils/monthColors";
+import { getMonthName } from "@/utils/dateTime";
 
 interface LeaveRow {
   id: number;
@@ -17,6 +19,7 @@ interface LeaveRow {
   from: string;
   to: string;
   status: string;
+  month: number;
 }
 
 const LeaveRequests = () => {
@@ -49,6 +52,7 @@ const LeaveRequests = () => {
           from: item.startDate || '-',
           to: item.endDate || '-',
           status: item.status || '-',
+          month: new Date(item.startDate).getMonth() + 1,
         })
       );
 
@@ -87,7 +91,7 @@ const LeaveRequests = () => {
         key: 'name',
         title: 'Employee',
         render: (value: unknown) => (
-          <span className="block min-w-[150px] break-words">
+          <span className="block min-w-[80px] break-words">
             {(value as string) || '-'}
           </span>
         ),
@@ -96,7 +100,7 @@ const LeaveRequests = () => {
         key: 'requestType',
         title: 'RequestType',
         render: (value: unknown) => (
-          <span className="whitespace-nowrap">
+          <span className="block whitespace-nowrap">
             {(value as string) || '-'}
           </span>
         ),
@@ -105,7 +109,7 @@ const LeaveRequests = () => {
         key: 'leaveType',
         title: 'LeaveType',
         render: (value: unknown) => (
-          <span className="whitespace-nowrap">
+          <span className="block whitespace-nowrap">
             {(value as string) || '-'}
           </span>
         ),
@@ -114,7 +118,7 @@ const LeaveRequests = () => {
         key: 'from',
         title: 'From',
         render: (value: unknown) => (
-          <span className="whitespace-nowrap">
+          <span className="block whitespace-nowrap">
             {(value as string) || '-'}
           </span>
         ),
@@ -123,7 +127,7 @@ const LeaveRequests = () => {
         key: 'to',
         title: 'To',
         render: (value: unknown) => (
-          <span className="whitespace-nowrap">
+          <span className="block whitespace-nowrap">
             {(value as string) || '-'}
           </span>
         ),
@@ -134,6 +138,21 @@ const LeaveRequests = () => {
         render: (value: unknown) => (
           <StatusBadge status={value as string} />
         ),
+      },
+      {
+        key: "month",
+        title: "Month",
+        render: (value: unknown) => {
+          const month = Number(value);
+
+          return (
+            <span
+              className={`rounded-full px-3 py-1 text-xs font-semibold ${getSalaryBadgeColor(month)}`}
+            >
+              {getMonthName(month)}
+            </span>
+          );
+        },
       },
       {
         key: 'action',
@@ -162,7 +181,7 @@ const LeaveRequests = () => {
     <div className="mx-auto w-full min-w-0 max-w-7xl space-y-4 sm:space-y-6">
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <PageHeader title="Leave Requests" />
+        <PageHeader title="Requests" />
 
         <div className="w-full sm:w-auto">
           <Breadcrumb />
@@ -177,7 +196,7 @@ const LeaveRequests = () => {
       </div>
 
       <div className="w-full overflow-x-auto rounded-xl border bg-white shadow-sm">
-        <div className="min-w-[760px]">
+        <div className="min-w-[600px]">
           <DataTable
             columns={columns}
             data={data}
@@ -185,6 +204,7 @@ const LeaveRequests = () => {
             currentPage={page}
             totalPages={totalPages}
             onPageChange={setPage}
+            rowClassName={(row) => getSalaryRowColor(row.month)}
           />
         </div>
       </div>
