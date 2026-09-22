@@ -6,11 +6,11 @@ export const MONTH_ROW_COLORS: Record<number, string> = {
     5: "bg-cyan-50",
     6: "bg-blue-50",
     7: "bg-purple-50",
-    8: "bg-pink-50",
-    9: "bg-slate-100",
-    10: "bg-indigo-50",
+    8: "bg-indigo-50",
+    9: "bg-rose-50",
+    10: "bg-pink-50",
     11: "bg-emerald-50",
-    12: "bg-rose-50",
+    12: "bg-slate-100",
 };
 
 export const MONTH_BADGE_COLORS: Record<number, string> = {
@@ -21,11 +21,11 @@ export const MONTH_BADGE_COLORS: Record<number, string> = {
     5: "bg-cyan-100 text-cyan-700",
     6: "bg-blue-100 text-blue-700",
     7: "bg-purple-100 text-purple-700",
-    8: "bg-pink-100 text-pink-700",
-    9: "bg-gray-200 text-gray-700",
-    10: "bg-indigo-100 text-indigo-700",
+    8: "bg-indigo-100 text-indigo-700",
+    9: "bg-rose-100 text-rose-700",
+    10: "bg-pink-100 text-pink-700",
     11: "bg-emerald-100 text-emerald-700",
-    12: "bg-rose-100 text-rose-700",
+    12: "bg-gray-200 text-gray-700",
 };
 
 export const getSalaryRowColor = (month: number) => {
