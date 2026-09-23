@@ -10,6 +10,7 @@ import { getLeaveRequests } from '@/services/admin.service';
 import PageLoader from '@/components/common/Loader/PageLoader';
 import { getSalaryBadgeColor, getSalaryRowColor } from "@/utils/monthColors";
 import { getMonthName } from "@/utils/dateTime";
+import { formatDate } from "@/utils/dateFormat";
 
 interface LeaveRow {
   id: number;
@@ -49,8 +50,8 @@ const LeaveRequests = () => {
           name: item.user?.name || '-',
           requestType: item.requestType || '-',
           leaveType: item.leaveType || '-',
-          from: item.startDate || '-',
-          to: item.endDate || '-',
+          from: formatDate(item.startDate || '-'),
+          to: formatDate(item.endDate || '-'),
           status: item.status || '-',
           month: new Date(item.startDate).getMonth() + 1,
         })
