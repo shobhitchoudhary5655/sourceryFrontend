@@ -9,6 +9,7 @@ import ConfirmModal from '@/components/ui/Modal/ConfirmModal';
 import { getHolidays, deleteHoliday, } from '@/services/admin.service';
 import PageLoader from '@/components/common/Loader/PageLoader';
 import { getSalaryRowColor } from "@/utils/monthColors";
+import { formatDate } from "@/utils/dateFormat";
 
 type Holiday = {
   id: number;
@@ -55,7 +56,7 @@ const Holidays = () => {
       const mapped: Holiday[] = (res.holidays || []).map((item: any) => ({
         id: item.id,
         name: item.holidayName,
-        date: item.date,
+        date: formatDate(item.date),
         holidayType: item.holidayType,
         description: item.description,
         employeeCount: item.employees?.length || 0,

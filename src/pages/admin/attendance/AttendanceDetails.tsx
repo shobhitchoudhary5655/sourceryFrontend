@@ -8,6 +8,8 @@ import StatusBadge from '@/components/ui/StatusBadge/StatusBadge';
 import { getAttendanceStatus, getEmployeeAttendance, getEmployeeDetails, } from '@/services/admin.service';
 import { formatISTTime } from '@/utils/dateTime';
 import { FiEdit2 } from "react-icons/fi";
+import { formatDate } from "@/utils/dateFormat";
+
 interface AttendanceRecord {
   id: number;
   userId: number;
@@ -129,7 +131,7 @@ const getMonthAttendanceRows = (
         checkOut: '-',
         officeHours: 0,
         workingHours: 0,
-        effectiveHours:0,
+        effectiveHours: 0,
         breakMinutes: 0,
         checkInLocation: "-",
         checkOutLocation: "-",
@@ -272,7 +274,7 @@ const EmployeeAttendanceDetails = () => {
         title: 'Date',
         render: (value: unknown) => (
           <span className="whitespace-nowrap">
-            {value as string}
+            {formatDate(value as string)}
           </span>
         ),
       },
