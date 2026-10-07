@@ -4,9 +4,10 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { ROUTES } from '@/routes/routes';
 import logo from '@/assets/logo/logo.png';
 import { useAuth } from '@/context/AuthContext';
-import { loginUser } from '@/services/auth.service';
+import { loginUser, googleLogin } from '@/services/auth.service';
 import notificationService from '@/services/notification.service';
 import Toast from '@/components/ui/Toast/Toast';
+import { GoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -59,6 +60,36 @@ const Login = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleGoogleLogin = async (credentialResponse: any) => {
+        try {
+            setLoading(true);
+            let fcmToken = "";
+            const granted = await notificationService.requestPermission();
+            if (granted) {
+                fcmToken = await notificationService.getFCMToken();
+            }
+
+            const response = await googleLogin({
+                token: credentialResponse.credential,
+                platform: "web",
+                fcmToken
+            });
+
+            if (!response.success) {
+                showToast(response.message, "error");
+                return;
+            }
+
+            login(response.token, response.user);
+            navigate(ROUTES.ADMIN.DASHBOARD);
+        } catch (error: any) {
+            showToast(error?.response?.data?.message || "Google login failed", "error");
+        } finally {
+            setLoading(false);
+        }
+
     };
 
     return (
@@ -174,6 +205,25 @@ const Login = () => {
                                     'Sign In'
                                 )}
                             </button>
+                            <div className="my-5 flex items-center">
+                                <div className="flex-1 border-t"></div>
+
+                                <span className="mx-4 text-gray-500">
+                                    OR
+                                </span>
+
+                                <div className="flex-1 border-t"></div>
+                            </div>
+
+                            <GoogleLogin
+                                onSuccess={handleGoogleLogin}
+                                onError={() =>
+                                    showToast(
+                                        "Google login failed",
+                                        "error"
+                                    )
+                                }
+                            />
                         </form>
                     </div>
                 </div>

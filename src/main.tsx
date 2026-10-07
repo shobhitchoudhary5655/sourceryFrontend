@@ -5,6 +5,7 @@ import { AuthProvider, } from '@/context/AuthContext';
 import './index.css';
 import { NotificationProvider } from './context/NotificationContext';
 import NotificationPopup from './components/ui/NotificationPopup/NotificationPopup';
+import { GoogleOAuthProvider } from "@react-oauth/google";
 if ("serviceWorker" in navigator) {
 
   navigator.serviceWorker.register(
@@ -23,11 +24,15 @@ ReactDOM.createRoot(
   document.getElementById('root')!
 ).render(
   <React.StrictMode>
-    <AuthProvider>
-      <NotificationProvider>
-        <NotificationPopup />
-        <AppRoutes />
-      </NotificationProvider>
-    </AuthProvider>
+    <GoogleOAuthProvider
+      clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+    >
+      <AuthProvider>
+        <NotificationProvider>
+          <NotificationPopup />
+          <AppRoutes />
+        </NotificationProvider>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   </React.StrictMode>
 );
