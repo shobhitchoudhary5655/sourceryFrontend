@@ -92,71 +92,63 @@ const EmployeeDetails = () => {
             {data.name || '-'}
           </h2>
 
-          {/* <p className="mt-1 text-gray-500">
+          <p className="mt-1 text-gray-500">
             {data.designation || '-'}
           </p>
 
           <p className="mt-1 text-sm text-gray-400">
             {data.email || '-'}
-          </p> */}
+          </p>
 
         </div>
 
-
-
         {/* Employee Details */}
         <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <DetailItem label="Employee ID" value={data.employeeId} />
+          <DetailItem label="Name" value={data.name} />
+          <DetailItem label="Email" value={data.email} />
+          <DetailItem label="Phone" value={data.phone} />
+          <DetailItem label="Gender" value={data.gender} />
+          <DetailItem
+            label="Date of Birth"
+            value={data.dateOfBirth ? new Date(data.dateOfBirth).toLocaleDateString() : "-"}
+          />
 
-
-          <div>
-            <p className="text-sm text-gray-500">
-              Phone
-            </p>
-
-            <p className="font-medium text-gray-800">
-              {data.phone || '-'}
-            </p>
-          </div>
-
-
-          <div>
-            <p className="text-sm text-gray-500">
-              Role
-            </p>
-
-            <p className="font-medium text-gray-800">
-              {data.role?.name || '-'}
-            </p>
-          </div>
-
-
-          <div>
-            <p className="text-sm text-gray-500">
-              Designation
-            </p>
-
-            <p className="font-medium text-gray-800">
-              {data.designation || '-'}
-            </p>
-          </div>
-
-
-          <div>
-            <p className="text-sm text-gray-500">
-              Email
-            </p>
-
-            <p className="break-all font-medium text-gray-800">
-              {data.email || '-'}
-            </p>
-          </div>
-
-
+          <DetailItem label="Role" value={data.role?.name || data.roleId} />
+          <DetailItem label="Designation" value={data.designation} />
+          <DetailItem
+            label="Joining Date"
+            value={data.joiningDate ? new Date(data.joiningDate).toLocaleDateString() : "-"}
+          />
+          <DetailItem label="Work Location" value={data.workLocation} />
+          <DetailItem label="Employee Type" value={data.employeeType} />
+          <DetailItem label="Salary" value={`₹${data.salary || 0}`} />
+          <DetailItem label="Status" value={data.status} />
+          <DetailItem label="CL Balance" value={data.clBalance} />
+          <DetailItem label="SL Balance" value={data.slBalance} />
+          <DetailItem label="Grace Balance" value={`${data.graceBalance} Minutes`} />
+          {/* <DetailItem
+            label="Created At"
+            value={data.createdAt ? new Date(data.createdAt).toLocaleString() : "-"}
+          />
+          <DetailItem
+            label="Updated At"
+            value={data.updatedAt ? new Date(data.updatedAt).toLocaleString() : "-"}
+          /> */}
         </div>
 
       </div>
     </div>
   );
 };
+
+const DetailItem = ({ label, value, }: { label: string; value: any; }) => (
+  <div>
+    <p className="text-sm text-gray-500">{label}</p>
+    <p className="mt-1 break-all font-medium text-gray-800">
+      {value || "-"}
+    </p>
+  </div>
+);
 
 export default EmployeeDetails;
