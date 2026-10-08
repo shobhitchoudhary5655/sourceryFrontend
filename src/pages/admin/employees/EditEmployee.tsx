@@ -601,7 +601,7 @@ const EditEmployee = () => {
             )}
           </div>
 
-          <div className="min-w-0">
+          {/* <div className="min-w-0">
             <label
               htmlFor="clBalance"
               className="text-sm font-medium text-gray-600"
@@ -647,7 +647,7 @@ const EditEmployee = () => {
                 {errors.slBalance}
               </p>
             )}
-          </div>
+          </div> */}
         </div>
 
         <div className="flex flex-col-reverse gap-3 border-t pt-5 sm:flex-row sm:justify-end">
